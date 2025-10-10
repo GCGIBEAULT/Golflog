@@ -28,12 +28,15 @@ function renderRounds() {
   log.innerHTML = '';
   rounds.forEach((r) => {
     const card = document.createElement('div');
-    card.innerHTML = `
-      ${r.date} — ${r.course} — ${r.score}<br>
-      Slope: ${r.slope}<br>
-      Handicap (live): ${handicap}<br>
-      ${r.notes}
-    `;
+.handicap-line {
+  font-size: 0.9rem;
+  color: #444;
+  font-style: italic;
+  margin-top: 0.2rem;
+  padding-left: 0.5rem;
+  border-left: 2px solid #007BFF;
+}
+
     log.appendChild(card);
   });
 }
