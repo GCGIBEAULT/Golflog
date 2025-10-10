@@ -25,9 +25,13 @@ function renderRounds() {
   log.innerHTML = '';
   rounds.forEach((r) => {
     const card = document.createElement('div');
-    card.innerHTML = `<strong>${r.date}</strong> — ${r.course} — ${r.score}<br>${r.notes}`;
+    card.innerHTML = `
+      ${r.date} — ${r.course} — ${r.score}<br>
+      ${r.notes}
+    `;
     log.appendChild(card);
   });
 }
+
 
 renderRounds();
