@@ -30,12 +30,15 @@ function renderRounds() {
     const partialRounds = rounds.slice(0, index + 1);
     const handicap = calculateHandicap(partialRounds);
     const card = document.createElement('div');
-    card.innerHTML = `
-      ${r.date} — ${r.course} — ${r.score}<br>
-      Slope: ${r.slope}<br>
-      <div class="handicap-line">Handicap (live): ${handicap}</div>
-      ${r.notes}
-    `;
+   card.innerHTML = `
+  <strong>Date:</strong> ${r.date}<br>
+  <strong>Course:</strong> ${r.course}<br>
+  <strong>Score:</strong> ${r.score}<br>
+  <strong>Slope:</strong> ${r.slope}<br>
+  <strong>Handicap (live):</strong> ${handicap}<br>
+  <strong>Notes:</strong> ${r.notes}
+`;
+
     log.appendChild(card);
   });
 }
