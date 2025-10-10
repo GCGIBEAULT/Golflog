@@ -1,4 +1,4 @@
-const form = document.getElementById('golfForm');
+if const form = document.getElementById('golfForm');
 const log = document.getElementById('log');
 
 form.addEventListener('submit', (e) => {
@@ -28,6 +28,12 @@ function renderRounds() {
   log.innerHTML = '';
   rounds.forEach((r) => {
     const card = document.createElement('div');
+    card.innerHTML = `
+      ${r.date} — ${r.course} — ${r.score}<br>
+      Slope: ${r.slope}<br>
+      <div class="handicap-line">Handicap (live): ${handicap}</div>
+      ${r.notes}
+    `;
     log.appendChild(card);
   });
 }
