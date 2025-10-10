@@ -8,6 +8,7 @@ const round = {
   course: document.getElementById('course').value,
   score: parseInt(document.getElementById('score').value),
   slope: parseInt(document.getElementById('slope').value),
+  handicap: parseInt(document.getElementById('handicapInput').value) || null,
   notes: document.getElementById('notes').value
 };
 
