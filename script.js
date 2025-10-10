@@ -24,16 +24,20 @@ function saveRound(round) {
 
 function renderRounds() {
   const rounds = JSON.parse(localStorage.getItem('golfRounds')) || [];
+  const handicap = calculateHandicap(rounds);
   log.innerHTML = '';
   rounds.forEach((r) => {
     const card = document.createElement('div');
     card.innerHTML = `
       ${r.date} — ${r.course} — ${r.score}<br>
+      Slope: ${r.slope}<br>
+      Handicap (live): ${handicap}<br>
       ${r.notes}
     `;
     log.appendChild(card);
   });
 }
+
 function calculateHandicap(rounds) {
   const validRounds = rounds.filter(r => r.score && r.slope);
   if (validRounds.length === 0) return '—';
@@ -45,3 +49,4 @@ function calculateHandicap(rounds) {
 
 
 renderRounds();
+(score - 72) * 113 / slope
