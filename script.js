@@ -24,9 +24,10 @@ function saveRound(round) {
 
 function renderRounds() {
   const rounds = JSON.parse(localStorage.getItem('golfRounds')) || [];
-  const handicap = calculateHandicap(rounds);
   log.innerHTML = '';
-  rounds.forEach((r) => {
+  rounds.forEach((r, index) => {
+    const partialRounds = rounds.slice(0, index + 1);
+    const handicap = calculateHandicap(partialRounds);
     const card = document.createElement('div');
     card.innerHTML = `
       ${r.date} — ${r.course} — ${r.score}<br>
