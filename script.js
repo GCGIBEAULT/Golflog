@@ -3,12 +3,14 @@ const log = document.getElementById('log');
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
-  const round = {
-    date: document.getElementById('date').value,
-    course: document.getElementById('course').value,
-    score: document.getElementById('score').value,
-    notes: document.getElementById('notes').value
-  };
+const round = {
+  date: document.getElementById('date').value,
+  course: document.getElementById('course').value,
+  score: parseInt(document.getElementById('score').value),
+  slope: parseInt(document.getElementById('slope').value),
+  notes: document.getElementById('notes').value
+};
+
   saveRound(round);
   form.reset();
   renderRounds();
@@ -31,6 +33,14 @@ function renderRounds() {
     `;
     log.appendChild(card);
   });
+}
+function calculateHandicap(rounds) {
+  const validRounds = rounds.filter(r => r.score && r.slope);
+  if (validRounds.length === 0) return '—';
+
+  const differentials = validRounds.map(r => ((r.score - 72) * 113) / r.slope);
+  const avg = differentials.reduce((a, b) => a + b, 0) / differentials.length;
+  return Math.round(avg * 0.96); // USGA formula
 }
 
 
