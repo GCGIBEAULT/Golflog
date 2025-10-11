@@ -61,11 +61,10 @@ function saveRound(round) {
 function calculateHandicap() {
   const score = parseFloat(document.getElementById('score').value);
   const slope = parseFloat(document.getElementById('slope').value);
-  const rating = 72; // Default course rating
-
+  const rating = 72;
   if (!isNaN(score) && !isNaN(slope) && slope > 0) {
     const differential = ((score - rating) * 113) / slope;
-    const handicap = Math.round(differential * 10) / 10; // round to 1 decimal
+    const handicap = Math.round(differential * 10) / 10;
     document.getElementById('handicapInput').value = handicap;
   } else {
     document.getElementById('handicapInput').value = '';
@@ -74,3 +73,4 @@ function calculateHandicap() {
 
 document.getElementById('score').addEventListener('input', calculateHandicap);
 document.getElementById('slope').addEventListener('input', calculateHandicap);
+
