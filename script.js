@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const saveBtn = document.getElementById("saveBtn");
-  const roundList = document.getElementById("roundList");
+  const saveBtn = document.querySelector("button");
+  const savedRounds = document.getElementById("savedRounds");
 
   // 🗓 Pre-fill today's date once, but allow manual edits
   const dateField = document.getElementById("date");
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function displayRounds() {
-    roundList.innerHTML = "";
+    savedRounds.innerHTML = "";
 
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const round = localStorage.getItem(key);
         const entry = document.createElement("div");
         entry.textContent = round;
-        roundList.appendChild(entry);
+        savedRounds.appendChild(entry);
       }
     }
   }
