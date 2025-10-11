@@ -5,37 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Golf Log</title>
   <style>
+    /* Base layout */
     body {
-      font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+      font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
       margin: 0;
       padding: 1rem;
       background: #fff;
+      color: #111;
     }
+
     header h1 {
       font-weight: 600;
       margin-bottom: 1rem;
     }
+
+    /* Compact form rhythm: inputs sit directly beneath labels */
     form {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.12rem;
+      max-width: 520px;
     }
+
     .form-line {
       display: flex;
       flex-direction: column;
+      margin: 0 0 0.12rem 0;
+      gap: 0;
     }
-    .form-line label {
+
+    .form-line label,
+    .form-line label strong {
+      display: block;
       font-weight: 700;
-      margin-bottom: 0.25rem;
+      margin: 0;
+      line-height: 1.2;
+      padding: 0;
     }
-    input, textarea {
+
+    .form-line input,
+    .form-line textarea {
+      margin: 0;
+      padding: 0.12rem 0;
       font-size: 1rem;
       border: none;
-      border-bottom: 1px solid #ccc;
-      padding: 0.5rem 0;
+      border-bottom: 1px solid #999;
       background: transparent;
+      line-height: 1.1;
     }
+
+    /* Save button compact placement */
     #saveBtn {
+      margin-top: 0.2rem;
       align-self: flex-start;
       background-color: #007BFF;
       color: white;
@@ -44,16 +65,48 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      transition: background-color 0.2s ease;
     }
+    #saveBtn:hover {
+      background-color: #0056b3;
+    }
+
+    /* Output log: match the same tight rhythm as the form */
     #log {
-      margin-top: 2rem;
+      margin-top: 1rem;
+      max-width: 720px;
     }
+
+    .log-card {
+      padding: 0.35rem 0;
+      border-bottom: 1px solid #e6e6e6;
+    }
+
     .log-line {
-      margin-bottom: 0.5rem;
-      line-height: 1.5;
+      margin: 0 0 0.12rem 0;
+      line-height: 1.1;
+      color: #111;
     }
+
     .log-line strong {
       font-weight: 700;
+      margin-right: 0.25rem;
+    }
+
+    /* Small handicap line style */
+    .handicap-line {
+      font-size: 0.9rem;
+      color: #444;
+      font-style: italic;
+      margin-top: 0.12rem;
+      padding-left: 0.5rem;
+      border-left: 2px solid #007BFF;
+    }
+
+    /* Small responsive tweak */
+    @media (max-width: 420px) {
+      body { padding: 0.75rem; }
+      form, #log { max-width: 100%; }
     }
   </style>
 </head>
@@ -62,44 +115,43 @@
     <h1>Golf Log</h1>
   </header>
 
-<form id="golfForm">
-  <div class="form-line">
-    <label for="date"><strong>Date (mm/dd/yyyy)</strong></label>
-    <input type="text" id="date" />
-  </div>
-  <div class="form-line">
-    <label for="course"><strong>Course Name</strong></label>
-    <input type="text" id="course" />
-  </div>
-  <div class="form-line">
-    <label for="score"><strong>Score</strong></label>
-    <input type="number" id="score" />
-  </div>
-  <div class="form-line">
-    <label for="slope"><strong>Slope Rating</strong></label>
-    <input type="number" id="slope" />
-  </div>
-  <div class="form-line">
-    <label for="handicapInput"><strong>Handicap</strong></label>
-    <input type="number" id="handicapInput" />
-  </div>
-  <div class="form-line">
-    <label for="notes"><strong>Notes</strong></label>
-    <textarea id="notes" rows="2"></textarea>
-  </div>
-  <button id="saveBtn" type="submit">Save Round</button>
-</form>
-
-
+  <form id="golfForm">
+    <div class="form-line">
+      <label for="date"><strong>Date (mm/dd/yyyy)</strong></label>
+      <input type="text" id="date" />
+    </div>
+    <div class="form-line">
+      <label for="course"><strong>Course Name</strong></label>
+      <input type="text" id="course" />
+    </div>
+    <div class="form-line">
+      <label for="score"><strong>Score</strong></label>
+      <input type="number" id="score" />
+    </div>
+    <div class="form-line">
+      <label for="slope"><strong>Slope Rating</strong></label>
+      <input type="number" id="slope" />
+    </div>
+    <div class="form-line">
+      <label for="handicapInput"><strong>Handicap</strong></label>
+      <input type="number" id="handicapInput" />
+    </div>
+    <div class="form-line">
+      <label for="notes"><strong>Notes</strong></label>
+      <textarea id="notes" rows="2"></textarea>
+    </div>
+    <button id="saveBtn" type="submit">Save Round</button>
+  </form>
 
   <div id="log"></div>
 
   <script>
     function calculateHandicap(rounds) {
       if (!rounds.length) return 0;
-      const scores = rounds.map(r => parseInt(r.score));
+      const scores = rounds.map(r => parseInt(r.score) || 0);
       const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-      return Math.round((avg - 72) * 113 / parseInt(rounds[rounds.length - 1].slope));
+      const lastSlope = parseInt(rounds[rounds.length - 1].slope) || 113;
+      return Math.round((avg - 72) * 113 / lastSlope);
     }
 
     function renderRounds() {
@@ -110,13 +162,14 @@
         const partialRounds = rounds.slice(0, index + 1);
         const handicap = calculateHandicap(partialRounds);
         const card = document.createElement('div');
+        card.className = 'log-card';
         card.innerHTML = `
-          <div class="log-line"><strong>Date:</strong> ${r.date}</div>
-          <div class="log-line"><strong>Course:</strong> ${r.course}</div>
-          <div class="log-line"><strong>Score:</strong> ${r.score}</div>
-          <div class="log-line"><strong>Slope:</strong> ${r.slope}</div>
+          <div class="log-line"><strong>Date:</strong> ${r.date || ''}</div>
+          <div class="log-line"><strong>Course:</strong> ${r.course || ''}</div>
+          <div class="log-line"><strong>Score:</strong> ${r.score || ''}</div>
+          <div class="log-line"><strong>Slope:</strong> ${r.slope || ''}</div>
           <div class="log-line"><strong>Handicap (live):</strong> ${handicap}</div>
-          <div class="log-line"><strong>Notes:</strong> ${r.notes}</div>
+          <div class="log-line"><strong>Notes:</strong> ${r.notes || ''}</div>
         `;
         log.appendChild(card);
       });
