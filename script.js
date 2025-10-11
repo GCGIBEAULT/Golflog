@@ -70,6 +70,8 @@ function calculateHandicap() {
     return null;
   }
 }
+window.calculateHandicap = calculateHandicap;
+window.saveRound = saveRound;
 
 // Live UI updates (single pair of listeners)
 document.getElementById('score').addEventListener('input', calculateHandicap);
