@@ -32,6 +32,12 @@ form.addEventListener('submit', (e) => {
   };
 
   saveRound(round);
+
+  // No reset. No deletion. Fields stay.
+});
+
+
+  saveRound(round);
   form.reset();
 
   // Clear saved field values
