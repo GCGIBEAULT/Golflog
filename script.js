@@ -1,7 +1,26 @@
 const form = document.getElementById('golfForm');
 
+// Restore saved field values on page load
+window.addEventListener('DOMContentLoaded', () => {
+  const fields = ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'];
+  fields.forEach(id => {
+    const saved = localStorage.getItem(`field_${id}`);
+    if (saved !== null) {
+      document.getElementById(id).value = saved;
+    }
+  });
+});
+
+// Save field values live as you type
+['date', 'course', 'score', 'slope', 'handicapInput', 'notes'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => {
+    localStorage.setItem(`field_${id}`, el.value);
+  });
+});
+
 form.addEventListener('submit', (e) => {
-  e.preventDefault(); // Stop page refresh
+  e.preventDefault();
 
   const round = {
     date: document.getElementById('date').value,
@@ -14,6 +33,11 @@ form.addEventListener('submit', (e) => {
 
   saveRound(round);
   form.reset();
+
+  // Clear saved field values
+  ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'].forEach(id => {
+    localStorage.removeItem(`field_${id}`);
+  });
 });
 
 function saveRound(round) {
