@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const fields = ['date', 'time', 'course', 'score', 'slope', 'rating', 'handicap', 'notes'];
-  const saveBtn = document.getElementById('saveBtn');
-  const roundList = document.getElementById('roundList');
+  const saveBtn = document.getElementById("saveBtn");
+  const roundList = document.getElementById("roundList");
 
   // 🗓 Pre-fill today's date once, but allow manual edits
-  const dateField = document.getElementById('date');
+  const dateField = document.getElementById("date");
   if (dateField && !dateField.value) {
     const today = new Date();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -13,50 +12,39 @@ document.addEventListener('DOMContentLoaded', () => {
     dateField.value = `${mm}/${dd}/${yyyy}`;
   }
 
-  // 🕒 Optional: Pre-fill current time once
-  const timeField = document.getElementById('time');
-  if (timeField && !timeField.value) {
-    const now = new Date();
-    let hours = now.getHours();
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12 || 12;
-    timeField.value = `${hours}:${minutes} ${ampm}`;
+  function saveRound() {
+    const date = document.getElementById("date").value;
+    const course = document.getElementById("course").value;
+    const score = document.getElementById("score").value;
+    const slope = document.getElementById("slope").value;
+    const rating = document.getElementById("rating").value;
+    const handicap = document.getElementById("handicap").value;
+    const notes = document.getElementById("notes").value;
+
+    const round = `${date} — ${course} Score: ${score}, Slope: ${slope} ${notes}`;
+    const timestamp = new Date().toLocaleString();
+    localStorage.setItem("round_" + timestamp, round);
+
+    displayRounds();
   }
 
-  // ✅ Save logic with validation gate
+  function displayRounds() {
+    roundList.innerHTML = "";
+
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key.startsWith("round_")) {
+        const round = localStorage.getItem(key);
+        const entry = document.createElement("div");
+        entry.textContent = round;
+        roundList.appendChild(entry);
+      }
+    }
+  }
+
   if (saveBtn) {
-    saveBtn.addEventListener('click', () => {
-      const round = {};
-      for (const id of fields) {
-        const el = document.getElementById(id);
-        round[id] = el?.value?.trim() || '';
-      }
-
-      // 🚫 Prevent ghost saves
-      if (!round.date || !round.course || !round.score || !round.slope) {
-        alert('Date, Course, Score, and Slope are required.');
-        return;
-      }
-
-      // 🔐 Unique key to prevent overwrite
-      const timestamp = new Date().toLocaleString() + "_" + Math.random().toString(36).substr(2, 5);
-
-      // 🧾 Format saved entry
-      const entry = `${round.date}, ${round.time} — ${round.course} Score: ${round.score}, Slope: ${round.slope}, Rating: ${round.rating}, HC: ${round.handicap} ${round.notes}`;
-      localStorage.setItem("round_" + timestamp, entry);
-
-      // 🧹 Clear and re-render saved rounds
-      roundList.innerHTML = "";
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith("round_")) {
-          const saved = localStorage.getItem(key);
-          const div = document.createElement("div");
-          div.textContent = saved;
-          roundList.appendChild(div);
-        }
-      }
-    });
+    saveBtn.addEventListener("click", saveRound);
   }
+
+  displayRounds();
 });
