@@ -2,6 +2,13 @@
 const form = document.getElementById('golfForm');
 const fields = ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'];
 
+// ⛔ Prevent accidental Enter from submitting the form
+form.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && e.target.id !== 'notes') {
+    e.preventDefault();
+  }
+});
+
 // Restore saved field values on page load
 window.addEventListener('DOMContentLoaded', () => {
   fields.forEach(id => {
@@ -12,6 +19,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
 
 // Save field values live as you type
 fields.forEach(id => {
