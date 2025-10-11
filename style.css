@@ -59,4 +59,25 @@ input, textarea, button {
 #log strong {
   font-weight: 700 !important;
 }
+.form-line {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.form-line label {
+  font-weight: 700;
+  margin-bottom: 0;
+}
+
+.form-line input,
+.form-line textarea {
+  margin-top: 0;
+  padding: 0.3rem 0;
+  font-size: 1rem;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  background: transparent;
+}
 
