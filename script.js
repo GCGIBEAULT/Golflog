@@ -1,21 +1,23 @@
-// script.js - corrected
+// script.js - single canonical implementation
 const form = document.getElementById('golfForm');
 const saveBtn = document.getElementById('saveBtn');
 const clearBtn = document.getElementById('clearBtn');
 const fields = ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'];
 
-// --- Prevent Enter from submitting the form (allow Enter in notes) ---
-form.addEventListener('keydown', function (e) {
-  if (e.key === 'Enter' && e.target.id !== 'notes') {
-    e.preventDefault();
-  }
-});
+// Prevent Enter from submitting the form (allow Enter in notes)
+if (form) {
+  form.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.id !== 'notes') {
+      e.preventDefault();
+    }
+  });
 
-// --- Neutralize form submit so Enter never saves ---
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  // intentionally do nothing so Enter cannot save
-});
+  // Neutralize form submit so Enter never saves
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    // intentionally do nothing here so Enter never saves
+  });
+}
 
 // --- Local storage helpers and render ---
 function saveRound(round) {
@@ -31,6 +33,7 @@ function loadRounds() {
 
 function renderSavedRounds() {
   const list = document.getElementById('roundList');
+  if (!list) return;
   list.innerHTML = '';
   const rounds = loadRounds();
   if (rounds.length === 0) {
@@ -55,43 +58,66 @@ function renderSavedRounds() {
   });
 }
 
-// --- Single canonical handicap calculator used by UI and save ---
+// Single canonical handicap calculator used by UI and save
 function calculateHandicap() {
-  const score = parseFloat(document.getElementById('score').value);
-  const slope = parseFloat(document.getElementById('slope').value);
+  const scoreEl = document.getElementById('score');
+  const slopeEl = document.getElementById('slope');
+  const hcEl = document.getElementById('handicapInput');
+  const score = scoreEl ? parseFloat(scoreEl.value) : NaN;
+  const slope = slopeEl ? parseFloat(slopeEl.value) : NaN;
   const rating = 72; // change if you want configurable rating
   if (!isNaN(score) && !isNaN(slope) && slope > 0) {
     const differential = ((score - rating) * 113) / slope;
     const handicap = Math.round(differential * 10) / 10;
-    document.getElementById('handicapInput').value = handicap;
+    if (hcEl) hcEl.value = handicap;
     return handicap;
   } else {
-    document.getElementById('handicapInput').value = '';
+    if (hcEl) hcEl.value = '';
     return null;
   }
 }
+
+// Expose for Console debugging if needed
 window.calculateHandicap = calculateHandicap;
 window.saveRound = saveRound;
 
 // Live UI updates (single pair of listeners)
-document.getElementById('score').addEventListener('input', calculateHandicap);
-document.getElementById('slope').addEventListener('input', calculateHandicap);
+const scoreInput = document.getElementById('score');
+const slopeInput = document.getElementById('slope');
+if (scoreInput) scoreInput.addEventListener('input', calculateHandicap);
+if (slopeInput) slopeInput.addEventListener('input', calculateHandicap);
 
-// --- Explicit Save button path (no form-submit reliance) ---
+// Improved explicit Save button handler — robust parsing + fallback
 if (saveBtn) {
   saveBtn.addEventListener('click', () => {
-    // Inline calculation so we never rely on DOM timing
-    const scoreVal = parseFloat(document.getElementById('score').value);
-    const slopeVal = parseFloat(document.getElementById('slope').value);
+    const scoreRaw = (document.getElementById('score') || {}).value || '';
+    const slopeRaw = (document.getElementById('slope') || {}).value || '';
+    const scoreVal = parseFloat((scoreRaw + '').trim());
+    const slopeVal = parseFloat((slopeRaw + '').trim());
+
+    // inline calculation (defensive)
     const rating = 72;
     let handicap = null;
-    if (!isNaN(scoreVal) && !isNaN(slopeVal) && slopeVal > 0) {
+    if (!Number.isNaN(scoreVal) && !Number.isNaN(slopeVal) && slopeVal > 0) {
       const differential = ((scoreVal - rating) * 113) / slopeVal;
       handicap = Math.round(differential * 10) / 10;
     }
 
-    // Ensure UI shows the computed value immediately
-    document.getElementById('handicapInput').value = handicap ?? '';
+    // fallback: if inline calc failed but UI shows a value, use it
+    if (handicap === null) {
+      const uiVal = (document.getElementById('handicapInput') || {}).value || '';
+      const uiNum = parseFloat((uiVal + '').trim());
+      if (!Number.isNaN(uiNum)) handicap = Math.round(uiNum * 10) / 10;
+    }
+
+    // Last-resort debug: if still null, warn with context
+    if (handicap === null) {
+      console.warn('Save: handicap missing — score:', scoreRaw, 'slope:', slopeRaw, 'hcField:', (document.getElementById('handicapInput') || {}).value);
+    }
+
+    // Ensure UI shows computed/fallback result immediately
+    const hcEl = document.getElementById('handicapInput');
+    if (hcEl) hcEl.value = handicap ?? '';
 
     const round = {
       date: (document.getElementById('date') || {}).value || '',
@@ -135,6 +161,7 @@ window.addEventListener('DOMContentLoaded', () => {
       if (el) el.value = saved;
     }
   });
+  // Ensure handicap field matches restored score/slope on load
   calculateHandicap();
   renderSavedRounds();
 });
