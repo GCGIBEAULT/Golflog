@@ -1,49 +1,44 @@
+// script.js - corrected
 const form = document.getElementById('golfForm');
+const fields = ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'];
 
 // Restore saved field values on page load
 window.addEventListener('DOMContentLoaded', () => {
-  const fields = ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'];
   fields.forEach(id => {
     const saved = localStorage.getItem(`field_${id}`);
     if (saved !== null) {
-      document.getElementById(id).value = saved;
+      const el = document.getElementById(id);
+      if (el) el.value = saved;
     }
   });
 });
 
 // Save field values live as you type
-['date', 'course', 'score', 'slope', 'handicapInput', 'notes'].forEach(id => {
+fields.forEach(id => {
   const el = document.getElementById(id);
+  if (!el) return;
   el.addEventListener('input', () => {
     localStorage.setItem(`field_${id}`, el.value);
   });
 });
 
+// Handle form submit: log the round, but do NOT reset or delete field saves
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const round = {
-    date: document.getElementById('date').value,
-    course: document.getElementById('course').value,
-    score: parseInt(document.getElementById('score').value),
-    slope: parseInt(document.getElementById('slope').value),
-    handicap: parseInt(document.getElementById('handicapInput').value) || null,
-    notes: document.getElementById('notes').value
+    date: (document.getElementById('date') || {}).value || '',
+    course: (document.getElementById('course') || {}).value || '',
+    score: parseInt((document.getElementById('score') || {}).value) || null,
+    slope: parseInt((document.getElementById('slope') || {}).value) || null,
+    handicap: parseInt((document.getElementById('handicapInput') || {}).value) || null,
+    notes: (document.getElementById('notes') || {}).value || ''
   };
 
   saveRound(round);
 
-  // No reset. No deletion. Fields stay.
-});
-
-
-  saveRound(round);
-  form.reset();
-
-  // Clear saved field values
-  ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'].forEach(id => {
-    localStorage.removeItem(`field_${id}`);
-  });
+  // Intentionally keep fields and their saved values in localStorage.
+  // If you later want a manual "Clear" button, we can add that separately.
 });
 
 function saveRound(round) {
