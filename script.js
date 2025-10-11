@@ -10,70 +10,76 @@ form.addEventListener('keydown', function (e) {
   if (e.key === 'Enter') {
     const tag = e.target.tagName.toLowerCase();
     const id = e.target.id;
-
-    // Allow Enter only in textarea (notes)
     if (!(tag === 'textarea' || id === 'notes')) {
       e.preventDefault();
     }
   }
 });
 
-
-// ✅ Canonical handicap calculator with cached elements
-const scoreEl = document.getElementById('score');
-const slopeEl = document.getElementById('slope');
-const hcEl = document.getElementById('handicapInput');
-
-function calculateHandicap() {
-  const score = parseFloat(scoreEl.value);
-  const slope = parseFloat(slopeEl.value);
-  const rating = 72;
-
-  if (!isNaN(score) && !isNaN(slope) && slope > 0) {
-    const differential = ((score - rating) * 113) / slope;
-    const handicap = Math.round(differential * 10) / 10;
-    hcEl.value = handicap;
-    return handicap;
-  } else {
-    hcEl.value = '';
-    return null;
-  }
-}
-
-// 🔁 Attach live listeners
-scoreEl.addEventListener('input', calculateHandicap);
-slopeEl.addEventListener('input', calculateHandicap);
-
-// 💾 Save round handler
+// ✅ Save round with editorial containment
 saveBtn.addEventListener('click', () => {
-  const scoreVal = parseFloat(document.getElementById('score').value);
-  const slopeVal = parseFloat(document.getElementById('slope').value);
-  const rating = 72;
-  let handicap = null;
-
-  if (!isNaN(scoreVal) && !isNaN(slopeVal) && slopeVal > 0) {
-    const differential = ((scoreVal - rating) * 113) / slopeVal;
-    handicap = Math.round(differential * 10) / 10;
-  }
-
-  // fallback: use field value if calc fails
-  if (handicap === null) {
-    const uiVal = parseFloat(document.getElementById('handicapInput').value);
-    if (!isNaN(uiVal)) handicap = Math.round(uiVal * 10) / 10;
-  }
-
-  document.getElementById('handicapInput').value = handicap ?? '';
-
   const round = {
-    date: document.getElementById('date').value || '',
-    course: document.getElementById('course').value || '',
-    score: Number.isFinite(scoreVal) ? parseInt(scoreVal) : null,
-    slope: Number.isFinite(slopeVal) ? parseInt(slopeVal) : null,
-    handicap: handicap,
-    notes: document.getElementById('notes').value || ''
+    date: document.getElementById('date').value.trim(),
+    course: document.getElementById('course').value.trim(),
+    score: document.getElementById('score').value.trim(),
+    slope: document.getElementById('slope').value.trim(),
+    handicap: document.getElementById('handicapInput').value.trim(),
+    notes: document.getElementById('notes').value.trim()
   };
 
-  saveRound(round);
+  if (!round.date || !round.course || !round.score || !round.slope) {
+    alert('Please fill out all required fields before saving.');
+    return;
+  }
+
+  const rounds = JSON.parse(localStorage.getItem('golfRounds') || '[]');
+  rounds.push(round);
+  localStorage.setItem('golfRounds', JSON.stringify(rounds));
+  renderSavedRounds();
+});
+
+// ✅ Render saved rounds
+function renderSavedRounds() {
+  const container = document.getElementById('savedRounds');
+  container.innerHTML = '';
+  const rounds = JSON.parse(localStorage.getItem('golfRounds') || '[]');
+
+  if (rounds.length === 0) {
+    container.innerHTML = '<p>No rounds saved yet.</p>';
+    return;
+  }
+
+  rounds.forEach((round, index) => {
+    const div = document.createElement('div');
+    div.className = 'round-entry';
+    div.innerHTML = `
+      <strong>${round.date}</strong> — ${round.course}<br>
+      Score: ${round.score}, Slope: ${round.slope}${round.handicap ? `, HC: ${round.handicap}` : ''}<br>
+      Notes: ${round.notes || '—'}
+    `;
+    container.appendChild(div);
+  });
+}
+
+// ✅ Autosave fields
+fields.forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', () => {
+    localStorage.setItem('field_' + id, el.value);
+  });
+});
+
+// ✅ Restore fields and rounds on load
+window.addEventListener('DOMContentLoaded', () => {
+  fields.forEach(id => {
+    const saved = localStorage.getItem('field_' + id);
+    if (saved !== null) {
+      const el = document.getElementById(id);
+      if (el) el.value = saved;
+    }
+  });
+  renderSavedRounds();
 });
 
 // 🧹 Clear fields
@@ -83,67 +89,4 @@ clearBtn.addEventListener('click', () => {
     if (el) el.value = '';
     localStorage.removeItem('field_' + id);
   });
-});
-
-// 🧠 Save to localStorage
-function saveRound(round) {
-  const rounds = JSON.parse(localStorage.getItem('golfRounds')) || [];
-  rounds.push(round);
-  localStorage.setItem('golfRounds', JSON.stringify(rounds));
-  renderSavedRounds();
-}
-
-// 📦 Load rounds
-function loadRounds() {
-  return JSON.parse(localStorage.getItem('golfRounds')) || [];
-}
-
-// 🖼️ Render saved rounds
-function renderSavedRounds() {
-  const list = document.getElementById('roundList');
-  if (!list) return;
-  list.innerHTML = '';
-  const rounds = loadRounds();
-  if (rounds.length === 0) {
-    list.textContent = 'No saved rounds yet.';
-    return;
-  }
-  rounds.slice().reverse().forEach(r => {
-    const div = document.createElement('div');
-    div.className = 'round';
-    const t = document.createElement('time');
-    t.textContent = r.date || 'No date';
-    div.appendChild(t);
-    const meta = document.createElement('div');
-    meta.innerHTML = `<strong>${r.course || 'No course'}</strong> — Score: ${r.score ?? '—'}, Slope: ${r.slope ?? '—'}, HC: ${r.handicap ?? '—'}`;
-    div.appendChild(meta);
-    if (r.notes) {
-      const p = document.createElement('div');
-      p.textContent = r.notes;
-      div.appendChild(p);
-    }
-    list.appendChild(div);
-  });
-}
-
-// 🧷 Persist field values
-fields.forEach(id => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.addEventListener('input', () => {
-    localStorage.setItem('field_' + id, el.value);
-  });
-});
-
-// 🔁 Restore on load
-window.addEventListener('DOMContentLoaded', () => {
-  fields.forEach(id => {
-    const saved = localStorage.getItem('field_' + id);
-    if (saved !== null) {
-      const el = document.getElementById(id);
-      if (el) el.value = saved;
-    }
-  });
-  calculateHandicap();
-  renderSavedRounds();
 });
