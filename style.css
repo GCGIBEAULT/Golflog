@@ -1,3 +1,4 @@
+/* Base layout */
 body {
   font-family: -apple-system, Segoe UI, Roboto, sans-serif;
   margin: 0;
@@ -5,35 +6,46 @@ body {
   background: #fff;
 }
 
-header h1 {
-  text-align: left;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
+/* Compact form rhythm */
 form {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.1rem;
 }
 
-input, textarea, button {
+/* Each label + control pair */
+.form-line {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 0.12rem 0;
+  gap: 0;
+}
+
+/* Labels kept bold, no bottom margin, tight line-height */
+.form-line label,
+.form-line label strong {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0;
+  line-height: 1.2;
+  padding: 0;
+}
+
+/* Inputs and textarea sit directly under the label */
+.form-line input,
+.form-line textarea {
+  margin: 0;
+  padding: 0.12rem 0;
   font-size: 1rem;
   border: none;
-  border-bottom: 1px solid #ccc;
-  padding: 0.5rem 0;
+  border-bottom: 1px solid #999;
   background: transparent;
+  line-height: 1.1;
 }
 
-#log {
-  margin-top: 2rem;
-}
-
-#log div {
-  margin-bottom: 1rem;
-  line-height: 1.4;
-}
+/* Save button compact placement */
 #saveBtn {
+  margin-top: 0.2rem;
   align-self: flex-start;
   background-color: #007BFF;
   color: white;
@@ -44,40 +56,34 @@ input, textarea, button {
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
+
 #saveBtn:hover {
   background-color: #0056b3;
 }
 
+/* Output log: match the same tight rhythm as the form */
+#log {
+  margin-top: 1rem;
+}
+
+#log div,
+#log .log-line {
+  margin: 0 0 0.12rem 0;
+  line-height: 1.1;
+}
+
+/* Ensure bold is honored inside the log */
+#log strong,
+#log .log-line strong {
+  font-weight: 700 !important;
+}
+
+/* Handicap line: compact and indented */
 .handicap-line {
   font-size: 0.9rem;
   color: #444;
   font-style: italic;
-  margin-top: 0.2rem;
+  margin-top: 0.12rem;
   padding-left: 0.5rem;
   border-left: 2px solid #007BFF;
 }
-#log strong {
-  font-weight: 700 !important;
-}
-.form-line {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 0.4rem;
-}
-
-.form-line label {
-  font-weight: 700;
-  margin-bottom: 0;
-  line-height: 1.2;
-}
-
-.form-line input,
-.form-line textarea {
-  margin-top: 0;
-  padding: 0.2rem 0;
-  font-size: 1rem;
-  border: none;
-  border-bottom: 1px solid #999;
-  background: transparent;
-}
-
