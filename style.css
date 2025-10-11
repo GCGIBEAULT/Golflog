@@ -11,31 +11,31 @@ body {
 form {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
   max-width: 520px;
+  gap: 0; /* ← kill the vertical spacing between form children */
 }
 
-/* Labels above each field */
 label {
   font-weight: 700;
-  margin-bottom: 0.1rem;
   line-height: 1.2;
+  margin: 0;
+  padding: 0;
   display: block;
 }
 
-/* Inputs and textarea: underline only */
 input,
 textarea {
   border: none;
   border-bottom: 1px solid #999;
   background: transparent;
   font-size: 1rem;
-  padding: 0.12rem 0;
-  line-height: 1.1;
+  padding: 0;
   margin: 0;
+  line-height: 1.1;
   width: 100%;
   box-sizing: border-box;
 }
+
 
 /* Notes field: slightly taller */
 textarea {
