@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const fields = ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'];
+  const form = document.getElementById('golfForm');
+  const saveBtn = document.getElementById('saveBtn');
+  const roundList = document.getElementById('roundList');
+
   // Auto-fill today's date if blank
   const dateField = document.getElementById('date');
   if (dateField && !dateField.value) {
@@ -8,11 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const yyyy = today.getFullYear();
     dateField.value = `${mm}/${dd}/${yyyy}`;
   }
-
-  const fields = ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'];
-  const form = document.getElementById('golfForm');
-  const saveBtn = document.getElementById('saveBtn');
-  const roundList = document.getElementById('roundList');
 
   if (form) {
     form.addEventListener('submit', e => {
@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Refill today's date after reset
-      const dateField = document.getElementById('date');
       if (dateField && !dateField.value) {
         const today = new Date();
         const mm = String(today.getMonth() + 1).padStart(2, '0');
