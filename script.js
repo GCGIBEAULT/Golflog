@@ -1,7 +1,7 @@
 // script.js — Drop-in replacement
 const form = document.getElementById('golfForm');
 // Prevent any form submit from reloading the page
-form.addEventListener('submit', e => e.preventDefault());
+if (form) form.addEventListener('submit', e => e.preventDefault());
 const saveBtn = document.getElementById('saveBtn');
 const clearBtn = document.getElementById('clearBtn');
 const fields = ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'];
