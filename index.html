@@ -1,246 +1,67 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
   <title>Golf Log</title>
   <style>
-    :root { --maxw: 720px; --muted: #666; --accent: #007BFF; }
     body {
-      font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      padding: 1rem;
-      background: #fff;
-      color: #111;
-      display: flex;
-      justify-content: center;
+      font-family: Arial, sans-serif;
+      margin: 20px;
     }
-    .wrap {
-      width: 100%;
-      max-width: var(--maxw);
+    label {
+      display: block;
+      margin-top: 10px;
     }
-    form {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem 1rem;
-      align-items: end;
-    }
-    label { font-weight: 700; font-size: 0.85rem; color: #111; }
-    .full { grid-column: 1 / -1; }
     input, textarea {
-      border: 1px solid #ddd;
-      padding: 0.45rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.95rem;
       width: 100%;
-      box-sizing: border-box;
+      padding: 6px;
+      margin-top: 4px;
     }
-    textarea { min-height: 3.2rem; resize: vertical; }
-    #saveBtn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 0.5rem 0.8rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 700;
+    button {
+      margin-top: 12px;
+      padding: 8px 16px;
     }
-    #saveBtn:hover { filter: brightness(0.95); }
-    h2 { margin: 1.25rem 0 0.35rem; font-size: 1rem; }
-    #roundList {
-      margin-top: 0.5rem;
-      border-top: 1px solid #eee;
-      padding-top: 0.75rem;
-      max-height: 50vh;
-      overflow: auto;
+    #roundList div {
+      margin-top: 8px;
+      padding: 6px;
+      border-bottom: 1px solid #ccc;
     }
-    .round {
-      padding: 0.6rem 0;
-      border-bottom: 1px dashed #f0f0f0;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 0.5rem;
-      align-items: start;
-    }
-    .round .meta { font-weight:700; }
-    .round .notes { color: var(--muted); font-size: 0.92rem; margin-top:0.35rem; grid-column: 1 / -1; }
-    .small { font-size: 0.85rem; color: var(--muted); }
-    .controls { display:flex; gap:0.5rem; }
-    .btn-plain { background: transparent; border: 1px solid #ddd; padding: 0.25rem 0.4rem; border-radius:4px; cursor:pointer; font-size:0.85rem; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-   <h1 style="margin:0 0 0.75rem; font-size:1.4rem; font-weight:900;">Golf Log</h1>
-     <form id="golfForm" autocomplete="off">
-      <div>
-        <label for="date">Date (mm/dd/yyyy)</label>
-        <input id="date" name="date" type="text" />
-      </div>
 
-      <div>
-        <label for="course">Course Name</label>
-        <input id="course" name="course" type="text" />
-      </div>
+  <h1>Golf Log</h1>
 
-      <div>
-        <label for="score">Score</label>
-        <input id="score" name="score" type="number" />
-      </div>
+  <label for="date">Date (mm/dd/yyyy)</label>
+  <input type="text" id="date" placeholder="e.g. 10/11/2025">
 
-      <div>
-        <label for="slope">Slope Rating</label>
-        <input id="slope" name="slope" type="number" />
-      </div>
+  <label for="time">Time (hh:mm AM/PM)</label>
+  <input type="text" id="time" placeholder="e.g. 12:04 PM">
 
-      <div>
-        <label for="handicapInput">Handicap</label>
-<input id="handicapInput" name="handicapInput" type="number" readonly />
+  <label for="course">Course Name</label>
+  <input type="text" id="course">
 
-      </div>
+  <label for="score">Score</label>
+  <input type="number" id="score">
 
-      <div class="full">
-        <label for="notes">Notes</label>
-        <textarea id="notes" name="notes" rows="2"></textarea>
-      </div>
+  <label for="slope">Slope</label>
+  <input type="number" id="slope">
 
-      <div class="full" style="display:flex; gap:0.5rem; align-items:center;">
-        <button id="saveBtn" type="submit">Save Round</button>
-      </div>
-    </form>
+  <label for="rating">Rating</label>
+  <input type="number" id="rating">
 
-    <h2>Saved Rounds</h2>
-    <div id="roundList" aria-live="polite"></div>
-  </div>
+  <label for="handicap">Handicap</label>
+  <input type="number" id="handicap">
 
-  <script>
-    // script.js inline — behavior:
-    // - autosave individual fields to keys field_<id> while typing
-    // - on load, restore fields from field_<id> so partially-entered rounds survive reload
-    // - render saved rounds from localStorage key 'golfRounds'
-    // - on Submit: append current round to golfRounds, render it at the top of the list,
-    //   clear the form for the next round, and remove the per-field autosave keys (so new entry starts empty)
-    // - Clear All Rounds button wipes golfRounds and the visible list
+  <label for="notes">Notes</label>
+  <textarea id="notes" rows="3"></textarea>
 
-    const form = document.getElementById('golfForm');
-    const fields = ['date','course','score','slope','handicapInput','notes'];
-    const roundListEl = document.getElementById('roundList');
+  <button id="saveBtn">Save Round</button>
 
-    // Utilities
-    function getStoredRounds() {
-      return JSON.parse(localStorage.getItem('golfRounds')) || [];
-    }
-    function storeRounds(rounds) {
-      localStorage.setItem('golfRounds', JSON.stringify(rounds));
-    }
+  <h2>Saved Rounds</h2>
+  <div id="roundList"></div>
 
-    // Render a single round element (inserting at top)
-    function renderRoundAtTop(round) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'round';
-
-      const left = document.createElement('div');
-      left.innerHTML = `<div class="meta">${escapeHtml(round.date || '')} — ${escapeHtml(round.course || '')} <span class="small">Score: ${escapeHtml(String(round.score || ''))} Slope: ${escapeHtml(String(round.slope || ''))} HC: ${escapeHtml(String(round.handicap || ''))}</span></div>`;
-
-      const right = document.createElement('div');
-      right.className = 'controls';
-      const ts = document.createElement('div');
-      ts.className = 'small';
-      ts.textContent = round.timestamp ? new Date(round.timestamp).toLocaleString() : '';
-      right.appendChild(ts);
-
-      wrapper.appendChild(left);
-      wrapper.appendChild(right);
-
-      if (round.notes) {
-        const notes = document.createElement('div');
-        notes.className = 'notes';
-        notes.textContent = round.notes;
-        wrapper.appendChild(notes);
-      }
-
-      // Insert at top
-      roundListEl.insertBefore(wrapper, roundListEl.firstChild);
-    }
-
-    // Render all rounds from storage (clears then populates)
-    function renderAllRounds() {
-      roundListEl.innerHTML = '';
-      const rounds = getStoredRounds();
-      // render newest first
-      for (let i = rounds.length - 1; i >= 0; i--) {
-        renderRoundAtTop(rounds[i]);
-      }
-    }
-
-    // Simple text-escape helper to avoid accidental HTML injection
-    function escapeHtml(s) {
-      return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
-    }
-
-    // Restore partially-entered fields (autosaved)
-    window.addEventListener('DOMContentLoaded', () => {
-      fields.forEach(id => {
-        const saved = localStorage.getItem(`field_${id}`);
-        if (saved !== null) {
-          const el = document.getElementById(id);
-          if (el) el.value = saved;
-        }
-      });
-      renderAllRounds();
-    });
-
-    // Autosave fields as you type
-    fields.forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.addEventListener('input', () => {
-        localStorage.setItem(`field_${id}`, el.value);
-      });
-    });
-
-    // Submit handler: append round, render, clear form and autosave keys
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const round = {
-        date: (document.getElementById('date') || {}).value || '',
-        course: (document.getElementById('course') || {}).value || '',
-        score: parseInt((document.getElementById('score') || {}).value) || null,
-        slope: parseInt((document.getElementById('slope') || {}).value) || null,
-        handicap: parseInt((document.getElementById('handicapInput') || {}).value) || null,
-        notes: (document.getElementById('notes') || {}).value || '',
-        timestamp: Date.now()
-      };
-
-      // Save to storage
-      const rounds = getStoredRounds();
-      rounds.push(round);
-      storeRounds(rounds);
-
-      // Render appended round immediately (at top)
-      renderRoundAtTop(round);
-
-      // Clear the form so new round can be entered
-      form.reset();
-
-      // Remove per-field autosave keys so the cleared form stays cleared
-      fields.forEach(id => {
-        localStorage.removeItem(`field_${id}`);
-      });
-
-      // Scroll the round list to top so the saved round is visible
-      roundListEl.scrollTop = 0;
-    });
-
-    // Clear all rounds control
-    document.getElementById('clearAllBtn').addEventListener('click', () => {
-      if (!confirm('Clear all saved rounds? This cannot be undone.')) return;
-      localStorage.removeItem('golfRounds');
-      renderAllRounds();
-    });
-  </script>
   <script src="script.js"></script>
+
 </body>
 </html>
