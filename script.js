@@ -34,12 +34,15 @@ fields.forEach(id => {
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
+  // 🔧 Force handicap calculation before saving
+  calculateHandicap();
+
   const round = {
     date: (document.getElementById('date') || {}).value || '',
     course: (document.getElementById('course') || {}).value || '',
     score: parseInt((document.getElementById('score') || {}).value) || null,
     slope: parseInt((document.getElementById('slope') || {}).value) || null,
-    handicap: parseInt((document.getElementById('handicapInput') || {}).value) || null,
+    handicap: parseFloat((document.getElementById('handicapInput') || {}).value) || null,
     notes: (document.getElementById('notes') || {}).value || ''
   };
 
@@ -48,6 +51,7 @@ form.addEventListener('submit', (e) => {
   // Intentionally keep fields and their saved values in localStorage.
   // If you later want a manual "Clear" button, we can add that separately.
 });
+
 
 function saveRound(round) {
   const rounds = JSON.parse(localStorage.getItem('golfRounds')) || [];
