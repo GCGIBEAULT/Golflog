@@ -12,25 +12,30 @@ form.addEventListener('keydown', function (e) {
   }
 });
 
-// ✅ Live handicap calculator
+// ✅ Canonical handicap calculator with cached elements
+const scoreEl = document.getElementById('score');
+const slopeEl = document.getElementById('slope');
+const hcEl = document.getElementById('handicapInput');
+
 function calculateHandicap() {
-  const score = parseFloat(document.getElementById('score').value);
-  const slope = parseFloat(document.getElementById('slope').value);
+  const score = parseFloat(scoreEl.value);
+  const slope = parseFloat(slopeEl.value);
   const rating = 72;
+
   if (!isNaN(score) && !isNaN(slope) && slope > 0) {
     const differential = ((score - rating) * 113) / slope;
     const handicap = Math.round(differential * 10) / 10;
-    document.getElementById('handicapInput').value = handicap;
+    hcEl.value = handicap;
     return handicap;
   } else {
-    document.getElementById('handicapInput').value = '';
+    hcEl.value = '';
     return null;
   }
 }
 
 // 🔁 Attach live listeners
-document.getElementById('score').addEventListener('input', calculateHandicap);
-document.getElementById('slope').addEventListener('input', calculateHandicap);
+scoreEl.addEventListener('input', calculateHandicap);
+slopeEl.addEventListener('input', calculateHandicap);
 
 // 💾 Save round handler
 saveBtn.addEventListener('click', () => {
