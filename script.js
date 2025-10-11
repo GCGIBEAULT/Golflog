@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
   const fields = ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'];
-  const form = document.getElementById('golfForm');
   const saveBtn = document.getElementById('saveBtn');
   const roundList = document.getElementById('roundList');
 
-  // Auto-fill today's date if blank
+  // 🗓 Auto-fill today's date if blank
   const dateField = document.getElementById('date');
   if (dateField && !dateField.value) {
     const today = new Date();
@@ -14,13 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dateField.value = `${mm}/${dd}/${yyyy}`;
   }
 
-  if (form) {
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      history.replaceState({}, '', location.pathname);
-    });
-  }
-
+  // ✅ Save logic with validation gate
   if (saveBtn) {
     saveBtn.addEventListener('click', () => {
       const round = {};
@@ -29,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         round[id] = el?.value?.trim() || '';
       }
 
-      // ✅ Validation gate to prevent ghost saves
+      // 🚫 Prevent ghost saves
       if (!round.date || !round.course || !round.score || !round.slope) {
         alert('Date, Course, Score, and Slope are required.');
         return;
@@ -39,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const entry = `${round.date} — ${round.course} Score: ${round.score}, Slope: ${round.slope} ${round.notes}`;
       localStorage.setItem("round_" + timestamp, entry);
 
-      // Display updated list
+      // 🧹 Clear and re-render saved rounds
       roundList.innerHTML = "";
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -49,6 +42,15 @@ document.addEventListener('DOMContentLoaded', () => {
           div.textContent = saved;
           roundList.appendChild(div);
         }
+      }
+
+      // 🔁 Refill today's date after save
+      if (dateField) {
+        const today = new Date();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const yyyy = today.getFullYear();
+        dateField.value = `${mm}/${dd}/${yyyy}`;
       }
     });
   }
