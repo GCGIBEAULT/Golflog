@@ -86,3 +86,17 @@ textarea {
   padding-left: 0.5rem;
   border-left: 2px solid #007BFF;
 }
+.round {
+  animation: fadeInMove 0.4s ease-out;
+}
+
+@keyframes fadeInMove {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
