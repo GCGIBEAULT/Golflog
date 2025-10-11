@@ -233,12 +233,6 @@
       roundListEl.scrollTop = 0;
     });
 
-    // Clear all rounds control
-    document.getElementById('clearAllBtn').addEventListener('click', () => {
-      if (!confirm('Clear all saved rounds? This cannot be undone.')) return;
-      localStorage.removeItem('golfRounds');
-      renderAllRounds();
-    });
   </script>
   <script src="script.js"></script>
 </body>
