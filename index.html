@@ -5,140 +5,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Golf Log</title>
-  <style>
-    body {
-      font-family: -apple-system, Segoe UI, Roboto, sans-serif;
-      margin: 0;
-      padding: 1rem;
-      background: #fff;
-    }
-    header h1 {
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    .form-line {
-      display: flex;
-      flex-direction: column;
-    }
-    .form-line label {
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-    }
-    input, textarea {
-      font-size: 1rem;
-      border: none;
-      border-bottom: 1px solid #ccc;
-      padding: 0.5rem 0;
-      background: transparent;
-    }
-    #saveBtn {
-      align-self: flex-start;
-      background-color: #007BFF;
-      color: white;
-      font-size: 0.85rem;
-      padding: 0.4rem 0.8rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    #log {
-      margin-top: 2rem;
-    }
-    .log-line {
-      margin-bottom: 0.5rem;
-      line-height: 1.5;
-    }
-    .log-line strong {
-      font-weight: 700;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>Golf Log</h1>
-  </header>
-
-  <form id="golfForm">
-    <div class="form-line">
-      <label for="date">Date (mm/dd/yyyy)</label>
-      <input type="text" id="date" required />
-    </div>
-    <div class="form-line">
-      <label for="course">Course Name</label>
-      <input type="text" id="course" required />
-    </div>
-    <div class="form-line">
-      <label for="score">Score</label>
-      <input type="number" id="score" required />
-    </div>
-    <div class="form-line">
-      <label for="slope">Slope Rating</label>
-      <input type="number" id="slope" required />
-    </div>
-    <div class="form-line">
-      <label for="handicapInput">Handicap</label>
-      <input type="number" id="handicapInput" />
-    </div>
-    <div class="form-line">
-      <label for="notes">Notes</label>
-      <textarea id="notes" rows="2"></textarea>
-    </div>
-    <button id="saveBtn" type="submit">Save Round</button>
-  </form>
-
-  <div id="log"></div>
-
-  <script>
-    function calculateHandicap(rounds) {
-      if (!rounds.length) return 0;
-      const scores = rounds.map(r => parseInt(r.score));
-      const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-      return Math.round((avg - 72) * 113 / parseInt(rounds[rounds.length - 1].slope));
-    }
-
-    function renderRounds() {
-      const rounds = JSON.parse(localStorage.getItem('golfRounds')) || [];
-      const log = document.getElementById('log');
-      log.innerHTML = '';
-      rounds.forEach((r, index) => {
-        const partialRounds = rounds.slice(0, index + 1);
-        const handicap = calculateHandicap(partialRounds);
-        const card = document.createElement('div');
-        card.innerHTML = `
-          <div class="log-line"><strong>Date:</strong> ${r.date}</div>
-          <div class="log-line"><strong>Course:</strong> ${r.course}</div>
-          <div class="log-line"><strong>Score:</strong> ${r.score}</div>
-          <div class="log-line"><strong>Slope:</strong> ${r.slope}</div>
-          <div class="log-line"><strong>Handicap (live):</strong> ${handicap}</div>
-          <div class="log-line"><strong>Notes:</strong> ${r.notes}</div>
-        `;
-        log.appendChild(card);
-      });
-    }
-
-    document.getElementById('golfForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const round = {
-        date: document.getElementById('date').value,
-        course: document.getElementById('course').value,
-        score: document.getElementById('score').value,
-        slope: document.getElementById('slope').value,
-        handicap: parseInt(document.getElementById('handicapInput').value) || null,
-        notes: document.getElementById('notes').value
-      };
-      const rounds = JSON.parse(localStorage.getItem('golfRounds')) || [];
-      rounds.push(round);
-      localStorage.setItem('golfRounds', JSON.stringify(rounds));
-      renderRounds();
-      this.reset();
-    });
-
-    renderRounds();
-  </script>
+  <header><h1>Golf Log</h1></header>
+  <main>
+    <form id="golfForm">
+      <input type="date" id="date" required />
+      <input type="text" id="course" placeholder="Course Name" required />
+      <input type="number" id="score" placeholder="Score" required />
+      <input type="number" id="slope" placeholder="Slope rating (e.g. 120)" required />
+      <input type="number" id="handicapInput" placeholder="Handicap">
+      <textarea id="notes" placeholder="Notes"></textarea>
+<button type="submit" id="saveBtn">Save Round</button>
+    </form>
+    <section id="log"></section>
+  </main>
+  <script src="script.js"></script>
 </body>
 </html>
