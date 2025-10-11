@@ -32,13 +32,15 @@ function renderRounds() {
     const handicap = calculateHandicap(partialRounds);
 
     const card = document.createElement('div');
+    card.className = 'log-card';
     card.innerHTML = `
-      <strong>Date:</strong> ${r.date}<br>
-      <strong>Course:</strong> ${r.course}<br>
-      <strong>Score:</strong> ${r.score}<br>
-      <strong>Slope:</strong> ${r.slope}<br>
-      <strong>Handicap (live):</strong> ${handicap}<br>
-      <strong>Notes:</strong> ${r.notes}<br><br>
+      <div class="log-line"><strong>Date:</strong> ${r.date}</div>
+      <div class="log-line"><strong>Course:</strong> ${r.course}</div>
+      <div class="log-line"><strong>Score:</strong> ${r.score}</div>
+      <div class="log-line"><strong>Slope:</strong> ${r.slope}</div>
+      <div class="handicap-line">Handicap (live): ${handicap}</div>
+      <div class="log-line"><strong>Notes:</strong> ${r.notes}</div>
+      <br>
     `;
     log.appendChild(card);
   });
@@ -50,7 +52,7 @@ function calculateHandicap(rounds) {
 
   const differentials = validRounds.map(r => ((r.score - 72) * 113) / r.slope);
   const avg = differentials.reduce((a, b) => a + b, 0) / validRounds.length;
-  return Math.round(avg * 0.96); // USGA formula
+  return Math.round(avg * 0.96);
 }
 
 renderRounds();
