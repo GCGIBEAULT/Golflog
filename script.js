@@ -1,4 +1,4 @@
-// Golf Log - Canonical script.js
+// Golf Log — Editorially locked script.js
 
 const form = document.getElementById('golfForm');
 const saveBtn = document.getElementById('saveBtn');
@@ -16,7 +16,7 @@ form.addEventListener('keydown', function (e) {
   }
 });
 
-// ✅ Save round with editorial containment
+// ✅ Save round and reset form
 saveBtn.addEventListener('click', () => {
   const round = {
     date: document.getElementById('date').value.trim(),
@@ -36,11 +36,12 @@ saveBtn.addEventListener('click', () => {
   rounds.push(round);
   localStorage.setItem('golfRounds', JSON.stringify(rounds));
   renderSavedRounds();
+  clearForm();
 });
 
 // ✅ Render saved rounds
 function renderSavedRounds() {
-  const container = document.getElementById('savedRounds');
+  const container = document.getElementById('roundList');
   container.innerHTML = '';
   const rounds = JSON.parse(localStorage.getItem('golfRounds') || '[]');
 
@@ -49,28 +50,30 @@ function renderSavedRounds() {
     return;
   }
 
-  rounds.forEach((round, index) => {
+  rounds.forEach(round => {
     const div = document.createElement('div');
-    div.className = 'round-entry';
+    div.className = 'round';
     div.innerHTML = `
-      <strong>${round.date}</strong> — ${round.course}<br>
-      Score: ${round.score}, Slope: ${round.slope}${round.handicap ? `, HC: ${round.handicap}` : ''}<br>
-      Notes: ${round.notes || '—'}
+      <div class="meta">${round.date} — ${round.course}</div>
+      <div>Score: ${round.score}, Slope: ${round.slope}${round.handicap ? `, HC: ${round.handicap}` : ''}</div>
+      <div class="notes">${round.notes || '—'}</div>
     `;
     container.appendChild(div);
   });
 }
 
-// ✅ Autosave fields
-fields.forEach(id => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.addEventListener('input', () => {
-    localStorage.setItem('field_' + id, el.value);
+// ✅ Clear form fields and autosave
+function clearForm() {
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.value = '';
+      localStorage.removeItem('field_' + id);
+    }
   });
-});
+}
 
-// ✅ Restore fields and rounds on load
+// ✅ Restore autosaved fields and rounds on load
 window.addEventListener('DOMContentLoaded', () => {
   fields.forEach(id => {
     const saved = localStorage.getItem('field_' + id);
@@ -82,11 +85,16 @@ window.addEventListener('DOMContentLoaded', () => {
   renderSavedRounds();
 });
 
-// 🧹 Clear fields
-clearBtn.addEventListener('click', () => {
-  fields.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-    localStorage.removeItem('field_' + id);
+// ✅ Autosave fields on input
+fields.forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', () => {
+    localStorage.setItem('field_' + id, el.value);
   });
 });
+
+// 🧹 Manual clear button (optional)
+if (clearBtn) {
+  clearBtn.addEventListener('click', clearForm);
+}
