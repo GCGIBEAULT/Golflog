@@ -62,33 +62,34 @@
     <h1>Golf Log</h1>
   </header>
 
-  <form id="golfForm">
-    <div class="form-line">
-      <label for="date">Date (mm/dd/yyyy)</label>
-      <input type="text" id="date" required />
-    </div>
-    <div class="form-line">
-      <label for="course">Course Name</label>
-      <input type="text" id="course" required />
-    </div>
-    <div class="form-line">
-      <label for="score">Score</label>
-      <input type="number" id="score" required />
-    </div>
-    <div class="form-line">
-      <label for="slope">Slope Rating</label>
-      <input type="number" id="slope" required />
-    </div>
-    <div class="form-line">
-      <label for="handicapInput">Handicap</label>
-      <input type="number" id="handicapInput" />
-    </div>
-    <div class="form-line">
-      <label for="notes">Notes</label>
-      <textarea id="notes" rows="2"></textarea>
-    </div>
-    <button id="saveBtn" type="submit">Save Round</button>
-  </form>
+<form id="golfForm">
+  <div class="form-line">
+    <label for="date"><strong>Date (mm/dd/yyyy)</strong></label>
+    <input type="text" id="date" required />
+  </div>
+  <div class="form-line">
+    <label for="course"><strong>Course Name</strong></label>
+    <input type="text" id="course" required />
+  </div>
+  <div class="form-line">
+    <label for="score"><strong>Score</strong></label>
+    <input type="number" id="score" required />
+  </div>
+  <div class="form-line">
+    <label for="slope"><strong>Slope Rating</strong></label>
+    <input type="number" id="slope" required />
+  </div>
+  <div class="form-line">
+    <label for="handicapInput"><strong>Handicap</strong></label>
+    <input type="number" id="handicapInput" />
+  </div>
+  <div class="form-line">
+    <label for="notes"><strong>Notes</strong></label>
+    <textarea id="notes" rows="2"></textarea>
+  </div>
+  <button id="saveBtn" type="submit">Save Round</button>
+</form>
+
 
   <div id="log"></div>
 
