@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const fields = ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'];
+  const fields = ['date', 'time', 'course', 'score', 'slope', 'rating', 'handicap', 'notes'];
   const saveBtn = document.getElementById('saveBtn');
   const roundList = document.getElementById('roundList');
 
-  // 🗓 Auto-fill today's date if blank
+  // 🗓 Pre-fill today's date once, but allow manual edits
   const dateField = document.getElementById('date');
   if (dateField && !dateField.value) {
     const today = new Date();
@@ -11,6 +11,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const dd = String(today.getDate()).padStart(2, '0');
     const yyyy = today.getFullYear();
     dateField.value = `${mm}/${dd}/${yyyy}`;
+  }
+
+  // 🕒 Optional: Pre-fill current time once
+  const timeField = document.getElementById('time');
+  if (timeField && !timeField.value) {
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    timeField.value = `${hours}:${minutes} ${ampm}`;
   }
 
   // ✅ Save logic with validation gate
@@ -28,8 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const timestamp = new Date().toLocaleString();
-      const entry = `${round.date} — ${round.course} Score: ${round.score}, Slope: ${round.slope} ${round.notes}`;
+      // 🔐 Unique key to prevent overwrite
+      const timestamp = new Date().toLocaleString() + "_" + Math.random().toString(36).substr(2, 5);
+
+      // 🧾 Format saved entry
+      const entry = `${round.date}, ${round.time} — ${round.course} Score: ${round.score}, Slope: ${round.slope}, Rating: ${round.rating}, HC: ${round.handicap} ${round.notes}`;
       localStorage.setItem("round_" + timestamp, entry);
 
       // 🧹 Clear and re-render saved rounds
@@ -42,15 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
           div.textContent = saved;
           roundList.appendChild(div);
         }
-      }
-
-      // 🔁 Refill today's date after save
-      if (dateField) {
-        const today = new Date();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        const yyyy = today.getFullYear();
-        dateField.value = `${mm}/${dd}/${yyyy}`;
       }
     });
   }
