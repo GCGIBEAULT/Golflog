@@ -7,10 +7,17 @@ const fields = ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'];
 
 // 🛑 Prevent Enter from submitting the form (except in notes)
 form.addEventListener('keydown', function (e) {
-  if (e.key === 'Enter' && e.target.id !== 'notes') {
-    e.preventDefault();
+  if (e.key === 'Enter') {
+    const tag = e.target.tagName.toLowerCase();
+    const id = e.target.id;
+
+    // Allow Enter only in textarea (notes)
+    if (!(tag === 'textarea' || id === 'notes')) {
+      e.preventDefault();
+    }
   }
 });
+
 
 // ✅ Canonical handicap calculator with cached elements
 const scoreEl = document.getElementById('score');
