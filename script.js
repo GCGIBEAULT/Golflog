@@ -1,113 +1,65 @@
-// script.js — Drop-in replacement
-const form = document.getElementById('golfForm');
-// Prevent any form submit from reloading the page
-if (form) form.addEventListener('submit', e => e.preventDefault());
-const saveBtn = document.getElementById('saveBtn');
-const clearBtn = document.getElementById('clearBtn');
-const fields = ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'];
-
-// Prevent Enter from submitting the form (except in notes)
-if (form) {
-  form.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
-      const tag = e.target.tagName.toLowerCase();
-      const id = e.target.id;
-      if (!(tag === 'textarea' || id === 'notes')) {
-        e.preventDefault();
-      }
-    }
-  });
-}
-
-// Save round and reset form
-if (saveBtn) {
-  saveBtn.addEventListener('click', () => {
-    const round = {
-      date: (document.getElementById('date') || {}).value?.trim() || '',
-      course: (document.getElementById('course') || {}).value?.trim() || '',
-      score: (document.getElementById('score') || {}).value?.trim() || '',
-      slope: (document.getElementById('slope') || {}).value?.trim() || '',
-      handicap: (document.getElementById('handicapInput') || {}).value?.trim() || '',
-      notes: (document.getElementById('notes') || {}).value?.trim() || ''
-    };
-
-    if (!round.date || !round.course || !round.score || !round.slope) {
-      alert('Please fill Date, Course, Score and Slope before saving.');
-      return;
-    }
-
-    const rounds = JSON.parse(localStorage.getItem('golfRounds') || '[]');
-    rounds.push(round);
-    localStorage.setItem('golfRounds', JSON.stringify(rounds));
-
-    renderSavedRounds();
-    clearFormFields();
-  });
-}
-
-// Render saved rounds into #roundList
-function renderSavedRounds() {
-  const container = document.getElementById('roundList');
-  if (!container) return;
-  container.innerHTML = '';
-  const rounds = JSON.parse(localStorage.getItem('golfRounds') || '[]');
-  if (rounds.length === 0) {
-    container.innerHTML = '<p>No rounds saved yet.</p>';
-    return;
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-fill today's date if blank
+  const dateField = document.getElementById('date');
+  if (dateField && !dateField.value) {
+    const today = new Date();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const yyyy = today.getFullYear();
+    dateField.value = `${mm}/${dd}/${yyyy}`;
   }
-  rounds.forEach((r, i) => {
-    const div = document.createElement('div');
-    div.className = 'round-entry';
-    div.innerHTML = `
-      <div class="meta"><strong>${escapeHtml(r.date)}</strong> — ${escapeHtml(r.course)}</div>
-      <div>Score: ${escapeHtml(r.score)}, Slope: ${escapeHtml(r.slope)}${r.handicap ? `, HC: ${escapeHtml(r.handicap)}` : ''}</div>
-      <div class="notes">${escapeHtml(r.notes || '—')}</div>
-    `;
-    container.appendChild(div);
-  });
-}
 
-// Clear form fields and autosave keys
-function clearFormFields() {
-  fields.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.value = '';
-      localStorage.removeItem('field_' + id);
+  const fields = ['date', 'course', 'score', 'slope', 'handicapInput', 'notes'];
+  const form = document.getElementById('golfForm');
+  const saveBtn = document.getElementById('saveBtn');
+  const roundList = document.getElementById('roundList');
+
+  if (form) {
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      history.replaceState({}, '', location.pathname);
+    });
+  }
+
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      const round = {};
+      for (const id of fields) {
+        const el = document.getElementById(id);
+        round[id] = el?.value?.trim() || '';
+      }
+
+      if (!round.date || !round.course || !round.score || !round.slope) {
+        alert('Date, Course, Score, and Slope are required.');
+        return;
+      }
+
+      const rounds = JSON.parse(localStorage.getItem('golfRounds') || '[]');
+      rounds.push(round);
+      localStorage.setItem('golfRounds', JSON.stringify(rounds));
+
+      renderRounds(rounds);
+      for (const id of fields) {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      }
+    });
+  }
+
+  function renderRounds(rounds) {
+    if (!roundList) return;
+    roundList.innerHTML = '';
+    for (const r of rounds) {
+      const div = document.createElement('div');
+      div.className = 'round-entry';
+      div.innerHTML = `
+        <div><strong>${r.date}</strong> — ${r.course}</div>
+        <div>Score: ${r.score}, Slope: ${r.slope}${r.handicapInput ? `, HC: ${r.handicapInput}` : ''}</div>
+        <div><em>${r.notes || '—'}</em></div>
+      `;
+      roundList.appendChild(div);
     }
-  });
-}
+  }
 
-// Restore autosaved fields and render on load
-window.addEventListener('DOMContentLoaded', () => {
-  fields.forEach(id => {
-    const saved = localStorage.getItem('field_' + id);
-    if (saved !== null) {
-      const el = document.getElementById(id);
-      if (el) el.value = saved;
-    }
-  });
-  renderSavedRounds();
+  renderRounds(JSON.parse(localStorage.getItem('golfRounds') || '[]'));
 });
-
-// Autosave fields on input
-fields.forEach(id => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.addEventListener('input', () => {
-    localStorage.setItem('field_' + id, el.value);
-  });
-});
-
-// Simple HTML escape to avoid accidental markup injection
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-// Optional clear button hookup
-if (clearBtn) clearBtn.addEventListener('click', clearFormFields);
