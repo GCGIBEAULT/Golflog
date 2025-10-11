@@ -46,3 +46,19 @@ function saveRound(round) {
   rounds.push(round);
   localStorage.setItem('golfRounds', JSON.stringify(rounds));
 }
+function calculateHandicap() {
+  const score = parseFloat(document.getElementById('score').value);
+  const slope = parseFloat(document.getElementById('slope').value);
+  const rating = 72; // Default course rating
+
+  if (!isNaN(score) && !isNaN(slope) && slope > 0) {
+    const differential = ((score - rating) * 113) / slope;
+    const handicap = Math.round(differential * 10) / 10; // round to 1 decimal
+    document.getElementById('handicapInput').value = handicap;
+  } else {
+    document.getElementById('handicapInput').value = '';
+  }
+}
+
+document.getElementById('score').addEventListener('input', calculateHandicap);
+document.getElementById('slope').addEventListener('input', calculateHandicap);
