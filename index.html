@@ -10,15 +10,28 @@
 <body>
   <header><h1>Golf Log</h1></header>
   <main>
-    <form id="golfForm">
-      <input type="date" id="date" required />
-      <input type="text" id="course" placeholder="Course Name" required />
-      <input type="number" id="score" placeholder="Score" required />
-      <input type="number" id="slope" placeholder="Slope rating (e.g. 120)" required />
-      <input type="number" id="handicapInput" placeholder="Handicap">
-      <textarea id="notes" placeholder="Notes"></textarea>
-<button type="submit" id="saveBtn">Save Round</button>
-    </form>
+<form id="golfForm">
+  <label for="date">Date (mm/dd/yyyy)</label>
+  <input type="text" id="date" />
+
+  <label for="course">Course Name</label>
+  <input type="text" id="course" />
+
+  <label for="score">Score</label>
+  <input type="number" id="score" />
+
+  <label for="slope">Slope Rating</label>
+  <input type="number" id="slope" />
+
+  <label for="handicapInput">Handicap</label>
+  <input type="number" id="handicapInput" />
+
+  <label for="notes">Notes</label>
+  <textarea id="notes" rows="2"></textarea>
+
+  <button id="saveBtn" type="submit">Save Round</button>
+</form>
+
     <section id="log"></section>
   </main>
   <script src="script.js"></script>
