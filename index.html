@@ -8,14 +8,10 @@
       font-family: Arial, sans-serif;
       margin: 20px;
     }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
     input, textarea {
       width: 100%;
       padding: 6px;
-      margin-top: 4px;
+      margin-top: 10px;
     }
     button {
       margin-top: 12px;
@@ -32,26 +28,13 @@
 
   <h1>Golf Log</h1>
 
-  <label for="date">Date (mm/dd/yyyy)</label>
-  <input type="text" id="date">
-
-  <label for="course">Course Name</label>
-  <input type="text" id="course">
-
-  <label for="score">Score</label>
-  <input type="number" id="score">
-
-  <label for="slope">Slope</label>
-  <input type="number" id="slope">
-
-  <label for="rating">Rating</label>
-  <input type="number" id="rating">
-
-  <label for="handicap">Handicap</label>
-  <input type="number" id="handicap">
-
-  <label for="notes">Notes</label>
-  <textarea id="notes" rows="3"></textarea>
+  <input type="text" id="date" placeholder="Date (mm/dd/yyyy)">
+  <input type="text" id="course" placeholder="Course Name">
+  <input type="number" id="score" placeholder="Score">
+  <input type="number" id="slope" placeholder="Slope">
+  <input type="number" id="rating" placeholder="Rating">
+  <input type="number" id="handicap" placeholder="Handicap">
+  <textarea id="notes" rows="3" placeholder="Notes"></textarea>
 
   <button onclick="saveRound()">Save Round</button>
 
