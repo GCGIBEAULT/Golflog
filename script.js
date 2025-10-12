@@ -74,27 +74,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     displayRounds();
 
-    // Clear fields, blur to dismiss keyboard and avoid input artifacts on phones
-    const d = document.getElementById("date");
-    const c = document.getElementById("course");
-    const s = document.getElementById("score");
-    const sl = document.getElementById("slope");
-    const h = document.getElementById("handicap");
-    const n = document.getElementById("notes");
+    // CLEAR reliably for mobile:
+    // 1) If form exists, use reset (clears inputs and helps avoid some autofill restores)
+    const form = document.querySelector("form");
+    if (form) {
+      try { form.reset(); } catch (e) { /* ignore */ }
+    }
 
-    if (d) { d.value = ""; d.blur(); }
-    if (c) { c.value = ""; c.blur(); }
-    if (s) { s.value = ""; s.blur(); }
-    if (sl) { sl.value = ""; sl.blur(); }
-    if (h) { h.value = ""; h.blur(); }
-    if (n) { n.value = ""; n.blur(); }
+    // 2) Explicit clear + blur to handle stubborn mobile input artifacts
+    const ids = ["date","course","score","slope","handicap","notes"];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.value = ""; el.blur(); }
+    });
 
-    // Small delay before refocus reduces race conditions on mobile browsers
+    // 3) Small delay then focus Date to avoid race with mobile keyboard/autofill
     setTimeout(() => {
       const dateField = document.getElementById("date");
       if (dateField) {
         dateField.focus();
-        if (dateField.setSelectionRange) dateField.setSelectionRange(0, 0);
+        if (dateField.setSelectionRange) dateField.setSelectionRange(0,0);
       }
     }, 120);
   }
