@@ -121,3 +121,71 @@
     </div>
 
     <div class="field">
+      <label for="slope">Slope</label>
+      <input type="number" id="slope">
+    </div>
+
+    <div class="field">
+      <label for="rating">Rating</label>
+      <input type="number" id="rating">
+    </div>
+
+    <div class="field">
+      <label for="handicap">Handicap</label>
+      <input type="number" id="handicap">
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="notes">Notes</label>
+    <textarea id="notes" rows="3" placeholder="Add any comments or conditions"></textarea>
+  </div>
+
+  <button id="saveBtn">Save Round</button>
+
+  <div id="savedRounds"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const saveBtn = document.getElementById("saveBtn");
+      const savedRounds = document.getElementById("savedRounds");
+
+      function saveRound() {
+        const date = document.getElementById("date").value;
+        const course = document.getElementById("course").value;
+        const score = document.getElementById("score").value;
+        const slope = document.getElementById("slope").value;
+        const rating = document.getElementById("rating").value;
+        const handicap = document.getElementById("handicap").value;
+        const notes = document.getElementById("notes").value;
+
+        const round = `<strong>${date}</strong> — ${course}<br>
+          Score: ${score}, Slope: ${slope}, Rating: ${rating}, Handicap: ${handicap}<br>${notes}`;
+        const timestamp = new Date().toLocaleString();
+        localStorage.setItem("round_" + timestamp, round);
+
+        displayRounds();
+      }
+
+      function displayRounds() {
+        savedRounds.innerHTML = "<h2>Saved Rounds</h2>";
+
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.startsWith("round_")) {
+            const round = localStorage.getItem(key);
+            const entry = document.createElement("div");
+            entry.className = "round-entry";
+            entry.innerHTML = round;
+            savedRounds.appendChild(entry);
+          }
+        }
+      }
+
+      saveBtn.addEventListener("click", saveRound);
+      displayRounds();
+    });
+  </script>
+
+</body>
+</html>
