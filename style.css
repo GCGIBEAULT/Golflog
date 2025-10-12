@@ -5,6 +5,7 @@ body {
   padding: 1rem;
   background: #fff;
   color: #111;
+  font-size: 18px; /* ← Mobile-friendly baseline */
 }
 
 /* Form layout: vertical stack */
