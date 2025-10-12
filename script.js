@@ -1,5 +1,7 @@
 // script.js - single-commit replacement (mobile-safe, clears fields after save)
 document.addEventListener('DOMContentLoaded', () => {
+ document.getElementById("date").value = new Date().toLocaleDateString("en-US");
+ 
   const saveBtn = document.getElementById("saveBtn");
   const savedRounds = document.getElementById("savedRounds");
   if (!savedRounds) { console.error("Missing #savedRounds element — check HTML IDs"); return; }
