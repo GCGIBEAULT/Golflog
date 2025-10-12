@@ -4,8 +4,33 @@ document.addEventListener('DOMContentLoaded', () => {
   const savedRounds = document.getElementById("savedRounds");
 
   // Enter key moves from Date → Course (explicit, no extra spaces)
-  const dateInput = document.getElementById("date");
-  const courseInput = document.getElementById("course");
+// Put this inside your existing DOMContentLoaded block or replace the current date listener
+const dateInput = document.getElementById("date");
+const courseInput = document.getElementById("course");
+
+function advanceToCourse(e) {
+  const isEnter =
+    e.key === "Enter" ||
+    e.code === "Enter" ||
+    e.keyCode === 13; // legacy fallback
+
+  if (!isEnter) return;
+
+  // stop anything else trying to handle Enter (forms, other listeners, IME)
+  e.preventDefault();
+  e.stopPropagation();
+
+  // small defer to ensure focus moves cleanly (helps on some mobile keyboards)
+  setTimeout(() => {
+    courseInput.focus();
+    console.log("Date → Course: Enter handled, focus moved");
+  }, 0);
+}
+
+// Attach to keydown (primary), and keypress (fallback on some older browsers)
+dateInput.removeEventListener("keydown", advanceToCourse);
+dateInput.addEventListener("keydown", advanceToCourse);
+dateInput.addEventListener("keypress", advanceToCourse);
 
   dateInput.addEventListener("keydown", function (e) {
     if (e.key === "Enter") {
