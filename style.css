@@ -1,28 +1,36 @@
-/* style.css — Mobile readable baseline */
+/* style.css — Full replacement (mobile-first, readable, stacks on phones) */
+
+/* Root / accessibility */
 html {
-  font-size: 20px; /* readable base for phones, adjust to taste */
+  font-size: 20px;               /* readable baseline for phones; adjust to 22-24 if desired */
   -webkit-text-size-adjust: 100%;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
 }
 
 body {
   font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   margin: 0;
   padding: 1rem;
-  background: #fff;
-  color: #111;
+  background: #ffffff;
+  color: #111111;
   max-width: 100%;
-  box-sizing: border-box;
+  line-height: 1.35;
 }
 
 /* Headline */
 h1 {
-  font-size: 2rem;
+  font-size: 1.8rem;
   margin: 0 0 1rem 0;
   border-bottom: 2px solid #0066cc;
   padding-bottom: 0.5rem;
+  font-weight: 700;
 }
 
-/* Layout rows */
+/* Basic row layout */
 .row {
   display: flex;
   gap: 1rem;
@@ -30,27 +38,53 @@ h1 {
   flex-wrap: wrap;
 }
 
-.row.full {
+/* Two-column grouping (use .row.two-col for Date/Course | Score/Slope) */
+.row.two-col {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+/* Column container holds paired fields vertically */
+.row.two-col .col {
+  flex: 1 1 0;
+  display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
-/* Inputs, textarea, button — readable and tappable */
-input, textarea, button, select, label {
-  font-size: 1rem;
-  padding: 0.6rem 0.75rem;
-  line-height: 1.3;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-}
-
-/* Make form controls take full width on narrow screens */
-input, textarea, select, button {
+/* Generic field wrapper if used */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
   width: 100%;
 }
 
-/* Slightly taller notes field */
+/* Controls: readable, tappable */
+label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #222;
+}
+
+input, textarea, select, button {
+  font-size: 1rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Inputs that should visibly match height */
+input[type="number"], input[type="text"], input[type="date"] {
+  height: auto;
+}
+
+/* Textarea */
 textarea {
   min-height: 4.5rem;
   resize: vertical;
@@ -62,12 +96,14 @@ button {
   color: #fff;
   border: none;
   cursor: pointer;
-  padding: 0.75rem;
+  padding: 0.7rem;
+  border-radius: 6px;
+  font-weight: 600;
 }
 
-button:active, button:focus {
+button:focus, button:active {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.12);
 }
 
 /* Saved rounds list */
@@ -82,81 +118,66 @@ button:active, button:focus {
   word-break: break-word;
 }
 
-/* Media tweaks for larger phones and small tablets */
+/* Desktop / wider screens: increase root slightly and keep two columns */
 @media (min-width: 600px) {
   html { font-size: 22px; }
-  .row { gap: 1.25rem; }
+  .row.two-col { gap: 1.25rem; }
   input, textarea, button { font-size: 1.0625rem; }
 }
-/* Mobile stacking: Course under Date, Slope under Score
-   Append this at the very end of style.css */
+
+/* Strong mobile stacking fallback: forces single-column on narrow phones
+   This ensures the right-hand column drops under the left-hand column,
+   so Course appears under Date and Slope under Score. */
 @media (max-width: 480px) {
-  /* stack row columns vertically */
-  .row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+  html { font-size: 20px; } /* keep a comfortable base on small screens */
 
-  /* ensure each field takes full width and does not flex */
-  .row .field {
-    width: 100%;
-    flex: none;
-  }
-
-  /* full-width, tappable controls inside each field */
-  .row .field input,
-  .row .field textarea,
-  .row .field select,
-  .row .field button {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0.6rem;
-    font-size: 1rem;
-  }
-
-  /* tighten vertical rhythm so stacked fields fit nicely */
-  .row .field + .field {
-    margin-top: 0.25rem;
-  }
-}
-/* Strong mobile stacking fallback — append at end of style.css */
-@media (max-width: 480px) {
-  /* Force rows to become vertical stacks */
+  /* make any .row behave as a vertical stack for extra safety */
   .row {
     display: flex !important;
     flex-direction: column !important;
     gap: 0.5rem !important;
   }
 
-  /* Make every direct child of .row take full width */
-  .row > * {
-    width: 100% !important;
-    flex: none !important;
-    box-sizing: border-box !important;
-    margin: 0 !important;
+  /* specifically stack the two-column grouping */
+  .row.two-col {
+    flex-direction: column !important;
   }
 
-  /* Ensure form controls inside those children fill the width and are tappable */
+  /* ensure each column or direct child of .row takes full width */
+  .row > *, .row.two-col .col {
+    width: 100% !important;
+    flex: none !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ensure controls fill width and are tappable */
   .row > * input,
   .row > * textarea,
   .row > * select,
-  .row > * button {
+  .row > * button,
+  .row.two-col .col input,
+  .row.two-col .col textarea,
+  .row.two-col .col select,
+  .row.two-col .col button {
     display: block !important;
     width: 100% !important;
-    padding: 0.6rem !important;
+    padding: 0.65rem !important;
     font-size: 1rem !important;
   }
 
-  /* If labels sit inline, push them above their control */
-  .row > * label {
+  /* labels above controls for clarity */
+  .row > * label, .row.two-col .col label {
     display: block !important;
     margin-bottom: 0.25rem !important;
-    font-weight: 600 !important;
+    font-size: 0.95rem !important;
   }
 
-  /* Tighten vertical rhythm so stacked fields fit nicely */
-  .row > * + * {
+  /* tighten vertical rhythm to fit narrow phones */
+  .row > * + *, .row.two-col .col + .col {
     margin-top: 0.25rem !important;
   }
+
+  /* slightly reduce saved rounds size so list doesn't dominate small viewports */
+  .log-line { font-size: 0.95rem !important; }
 }
