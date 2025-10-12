@@ -2,25 +2,19 @@
 document.addEventListener('DOMContentLoaded', () => {
   const saveBtn = document.getElementById("saveBtn");
   const savedRounds = document.getElementById("savedRounds");
+  if (!savedRounds) { console.error("Missing #savedRounds element — check HTML IDs"); return; }
 
-  if (!savedRounds) {
-    console.error("Missing #savedRounds element — check HTML IDs");
-    return;
-  }
-
-  // Optional: Enter on date advances to course
+  // Optional UX: Enter on date advances to course
   const dateEl = document.getElementById("date");
   const courseEl = document.getElementById("course");
   if (dateEl && courseEl) {
     function advanceToCourse(e) {
       const isEnter = e.key === "Enter" || e.code === "Enter" || e.keyCode === 13;
       if (!isEnter || document.activeElement !== dateEl) return;
-      e.preventDefault();
-      e.stopPropagation();
+      e.preventDefault(); e.stopPropagation();
       setTimeout(() => courseEl.focus(), 0);
     }
     dateEl.addEventListener("keydown", advanceToCourse);
-    dateEl.addEventListener("keypress", advanceToCourse);
   }
 
   function displayRounds() {
@@ -30,14 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const key = localStorage.key(i);
       if (key && key.startsWith("round_")) keys.push(key);
     }
-    keys.sort().reverse(); // newest first
-
+    keys.sort().reverse();
     for (const key of keys) {
       const round = localStorage.getItem(key) || "";
       const entry = document.createElement("div");
       entry.className = "round-entry";
       entry.innerHTML = `
-        <span class="round-text">${round}</span>
+        <span class="round-text">${escapeHtml(round)}</span>
         <button class="delete-btn" data-key="${key}" title="Delete this round">×</button>
       `;
       savedRounds.appendChild(entry);
@@ -45,13 +38,19 @@ document.addEventListener('DOMContentLoaded', () => {
       if (del) {
         del.addEventListener("click", function () {
           const keyToDelete = this.getAttribute("data-key");
-          if (keyToDelete) {
-            localStorage.removeItem(keyToDelete);
-            displayRounds();
-          }
+          if (keyToDelete) { localStorage.removeItem(keyToDelete); displayRounds(); }
         });
       }
     }
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   function saveRound() {
@@ -75,8 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
     displayRounds();
 
     // CLEAR reliably for mobile:
-    // 1) If form exists, use reset (clears inputs and helps avoid some autofill restores)
-    const form = document.querySelector("form");
+    // 1) reset form if present
+    const form = document.getElementById("roundForm") || document.querySelector("form");
     if (form) {
       try { form.reset(); } catch (e) { /* ignore */ }
     }
@@ -85,17 +84,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const ids = ["date","course","score","slope","handicap","notes"];
     ids.forEach(id => {
       const el = document.getElementById(id);
-      if (el) { el.value = ""; el.blur(); }
+      if (el) {
+        try {
+          el.value = "";
+          el.removeAttribute && el.removeAttribute('value');
+          el.blur();
+        } catch (e) { /* ignore per-field */ }
+      }
     });
 
     // 3) Small delay then focus Date to avoid race with mobile keyboard/autofill
     setTimeout(() => {
       const dateField = document.getElementById("date");
       if (dateField) {
-        dateField.focus();
-        if (dateField.setSelectionRange) dateField.setSelectionRange(0,0);
+        try {
+          dateField.focus();
+          if (dateField.setSelectionRange) dateField.setSelectionRange(0,0);
+        } catch (e) { /* ignore */ }
       }
-    }, 120);
+    }, 150);
   }
 
   if (saveBtn) saveBtn.addEventListener("click", (e) => { e.preventDefault(); saveRound(); });
