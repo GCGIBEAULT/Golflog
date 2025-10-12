@@ -120,3 +120,43 @@ button:active, button:focus {
     margin-top: 0.25rem;
   }
 }
+/* Strong mobile stacking fallback — append at end of style.css */
+@media (max-width: 480px) {
+  /* Force rows to become vertical stacks */
+  .row {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Make every direct child of .row take full width */
+  .row > * {
+    width: 100% !important;
+    flex: none !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+  }
+
+  /* Ensure form controls inside those children fill the width and are tappable */
+  .row > * input,
+  .row > * textarea,
+  .row > * select,
+  .row > * button {
+    display: block !important;
+    width: 100% !important;
+    padding: 0.6rem !important;
+    font-size: 1rem !important;
+  }
+
+  /* If labels sit inline, push them above their control */
+  .row > * label {
+    display: block !important;
+    margin-bottom: 0.25rem !important;
+    font-weight: 600 !important;
+  }
+
+  /* Tighten vertical rhythm so stacked fields fit nicely */
+  .row > * + * {
+    margin-top: 0.25rem !important;
+  }
+}
