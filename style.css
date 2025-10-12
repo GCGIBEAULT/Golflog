@@ -39,9 +39,9 @@ textarea {
 }
 
 .app-scale {
-  transform: scale(1.25);
-  transform-origin: top left;
+  zoom: 1.25;
 }
+
 
 
 /* Notes field: slightly taller */
