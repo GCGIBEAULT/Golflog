@@ -1,18 +1,23 @@
+// script.js
 document.addEventListener('DOMContentLoaded', () => {
   const saveBtn = document.getElementById("saveBtn");
   const savedRounds = document.getElementById("savedRounds");
 
-  // PLACED: Enter key moves from Date → Course
-  document.getElementById("date").addEventListener("keydown", function(e) {
+  // Enter key moves from Date → Course (explicit, no extra spaces)
+  const dateInput = document.getElementById("date");
+  const courseInput = document.getElementById("course");
+
+  dateInput.addEventListener("keydown", function (e) {
     if (e.key === "Enter") {
-      e.preventDefault();
-      document.getElementById("course").focus();
+      e.preventDefault();               // prevent form submission or default behavior
+      console.log("Enter pressed in Date — moving focus to Course");
+      courseInput.focus();
     }
   });
 
   function saveRound() {
-    const date = document.getElementById("date").value;
-    const course = document.getElementById("course").value;
+    const date = dateInput.value;
+    const course = courseInput.value;
     const score = document.getElementById("score").value;
     const slope = document.getElementById("slope").value;
     const handicap = document.getElementById("handicap").value;
@@ -27,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function displayRounds() {
     savedRounds.innerHTML = "<h2>Saved Rounds</h2>";
-
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key.startsWith("round_")) {
