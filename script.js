@@ -1,4 +1,11 @@
 // script.js
+const dateInput = document.getElementById("date");
+const courseInput = document.getElementById("course");
+const scoreInput = document.getElementById("score");
+const slopeInput = document.getElementById("slope");
+const handicapInput = document.getElementById("handicap");
+const notesInput = document.getElementById("notes");
+
 document.addEventListener('DOMContentLoaded', () => {
   const saveBtn = document.getElementById("saveBtn");
   const savedRounds = document.getElementById("savedRounds");
