@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,16 +9,20 @@
       font-family: Arial, sans-serif;
       margin: 20px;
     }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
     input, textarea {
       width: 100%;
       padding: 6px;
-      margin-top: 10px;
+      margin-top: 4px;
     }
     button {
       margin-top: 12px;
       padding: 8px 16px;
     }
-    #savedRounds div {
+    #roundList div {
       margin-top: 8px;
       padding: 6px;
       border-bottom: 1px solid #ccc;
@@ -28,18 +33,34 @@
 
   <h1>Golf Log</h1>
 
-  <input type="text" id="date" placeholder="Date (mm/dd/yyyy)">
-  <input type="text" id="course" placeholder="Course Name">
-  <input type="number" id="score" placeholder="Score">
-  <input type="number" id="slope" placeholder="Slope">
-  <input type="number" id="rating" placeholder="Rating">
-  <input type="number" id="handicap" placeholder="Handicap">
-  <textarea id="notes" rows="3" placeholder="Notes"></textarea>
+  <label for="date">Date (mm/dd/yyyy)</label>
+  <input type="text" id="date" placeholder="e.g. 10/11/2025">
 
-  <button onclick="saveRound()">Save Round</button>
+  <label for="time">Time (hh:mm AM/PM)</label>
+  <input type="text" id="time" placeholder="e.g. 12:04 PM">
+
+  <label for="course">Course Name</label>
+  <input type="text" id="course">
+
+  <label for="score">Score</label>
+  <input type="number" id="score">
+
+  <label for="slope">Slope</label>
+  <input type="number" id="slope">
+
+  <label for="rating">Rating</label>
+  <input type="number" id="rating">
+
+  <label for="handicap">Handicap</label>
+  <input type="number" id="handicap">
+
+  <label for="notes">Notes</label>
+  <textarea id="notes" rows="3"></textarea>
+
+  <button id="saveBtn">Save Round</button>
 
   <h2>Saved Rounds</h2>
-  <div id="savedRounds"></div>
+  <div id="roundList"></div>
 
   <script src="script.js"></script>
 
