@@ -1,74 +1,90 @@
-/* Root font size: doubled for mobile readability */
+/* style.css — Mobile readable baseline */
 html {
-  font-size: 32px;
+  font-size: 20px; /* readable base for phones, adjust to taste */
+  -webkit-text-size-adjust: 100%;
 }
 
-/* Body layout: breathable, centered, no constraint */
 body {
-  font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+  font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   margin: 0;
-  padding: 2rem;
+  padding: 1rem;
   background: #fff;
   color: #111;
   max-width: 100%;
+  box-sizing: border-box;
 }
 
-/* Headline: bold and clear */
+/* Headline */
 h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+  font-size: 2rem;
+  margin: 0 0 1rem 0;
   border-bottom: 2px solid #0066cc;
   padding-bottom: 0.5rem;
 }
 
-/* Form layout: stacked and spaced */
+/* Layout rows */
 .row {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 .row.full {
   flex-direction: column;
+  gap: 0.75rem;
 }
 
-/* Inputs and button: readable and tappable */
-input, textarea, button {
-  font-size: 2rem;
-  padding: 0.75rem;
-  line-height: 1.4;
+/* Inputs, textarea, button — readable and tappable */
+input, textarea, button, select, label {
+  font-size: 1rem;
+  padding: 0.6rem 0.75rem;
+  line-height: 1.3;
   border: 1px solid #ccc;
   border-radius: 6px;
+  box-sizing: border-box;
 }
 
-/* Notes field: slightly taller */
+/* Make form controls take full width on narrow screens */
+input, textarea, select, button {
+  width: 100%;
+}
+
+/* Slightly taller notes field */
 textarea {
+  min-height: 4.5rem;
   resize: vertical;
-  min-height: 2.2rem;
 }
 
-/* Save button: bold and visible */
+/* Primary button */
 button {
   background-color: #007BFF;
-  color: white;
+  color: #fff;
   border: none;
-  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  padding: 0.75rem;
 }
 
-button:hover {
-  background-color: #0056b3;
+button:active, button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
 }
 
-/* Saved rounds: readable and spaced */
+/* Saved rounds list */
 #savedRounds {
-  margin-top: 2rem;
+  margin-top: 1.25rem;
 }
 
 .log-line {
-  font-size: 1.8rem;
-  line-height: 1.3;
-  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  margin-bottom: 0.6rem;
   word-break: break-word;
+}
+
+/* Media tweaks for larger phones and small tablets */
+@media (min-width: 600px) {
+  html { font-size: 22px; }
+  .row { gap: 1.25rem; }
+  input, textarea, button { font-size: 1.0625rem; }
 }
