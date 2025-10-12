@@ -8,6 +8,10 @@
   <meta name="keywords" content="Golf Log, golf score tracker, mobile golf app, localStorage, no install, privacy-first">
   <meta name="author" content="Gregg Gibeault">
   <style>
+    html {
+      font-size: 18px; /* Mobile-friendly baseline */
+    }
+
     body {
       font-family: -apple-system, Segoe UI, Roboto, sans-serif;
       margin: 0;
@@ -16,7 +20,7 @@
       color: #111;
     }
 
-        h1 {
+    h1 {
       font-size: 2rem;
       margin-bottom: 1rem;
       border-bottom: 2px solid #0066cc;
@@ -49,16 +53,14 @@
   </style>
 </head>
 <body>
-  <div class="app-scale">
-    <h1>Golf Log</h1>
-    <div class="row full">
-      <input type="text" id="course" placeholder="Course Name">
-      <input type="number" id="score" placeholder="Score">
-      <input type="text" id="conditions" placeholder="Conditions">
-      <button onclick="saveRound()">Save Round</button>
-    </div>
-    <div id="savedRounds"></div>
+  <h1>Golf Log</h1>
+  <div class="row full">
+    <input type="text" id="course" placeholder="Course Name">
+    <input type="number" id="score" placeholder="Score">
+    <input type="text" id="conditions" placeholder="Conditions">
+    <button onclick="saveRound()">Save Round</button>
   </div>
+  <div id="savedRounds"></div>
 
   <script>
     function saveRound() {
