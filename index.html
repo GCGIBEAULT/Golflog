@@ -1,120 +1,180 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Golf Log — Mobile</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+<title>Golf Log — Mobile Score Tracker</title>
+ <!-- SEO tags verified: 2025-10-12 13:25 MDT -->
+<meta name="description" content="Golf Log app for tracking rounds, scores, and conditions. Mobile-first, privacy-first, no login required.">
+<meta name="keywords" content="Golf Log, golf score tracker, mobile golf app, localStorage, no install, privacy-first">
+<meta name="author" content="Gregg Gibeault">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      color: #222;
+      padding: 2rem;
+      max-width: 700px;
+      margin: auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #0066cc;
+      padding-bottom: 0.5rem;
+    }
+
+    .row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .row.full {
+      flex-direction: column;
+    }
+
+    .field {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .field label {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .field input,
+    .field textarea {
+      padding: 0.6rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button {
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.4rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background-color: #004c99;
+    }
+
+    #savedRounds {
+      margin-top: 2rem;
+    }
+
+    .round-entry {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+  </style>
 </head>
 <body>
-  <main class="container">
-    <h1>Golf Log</h1>
 
-    <form id="roundForm" class="single-column" onsubmit="saveRound(event)">
-      <!-- Date and Course stacked -->
+  <h1>Golf Log</h1>
+
+  <div class="row">
+    <div class="field">
       <label for="date">Date</label>
-      <input id="date" name="date" type="text" placeholder="mm/dd/yyyy" inputmode="numeric" />
-
+      <input type="text" id="date" placeholder="mm/dd/yyyy">
+    </div>
+    <div class="field">
       <label for="course">Course Name</label>
-      <input id="course" name="course" type="text" placeholder="Course Name" />
+      <input type="text" id="course">
+    </div>
+  </div>
 
-      <!-- Score and Slope stacked -->
+  <div class="row">
+    <div class="field">
       <label for="score">Score</label>
-      <input id="score" name="score" type="number" inputmode="numeric" placeholder="Score" />
-
+      <input type="number" id="score">
+    </div>
+    <div class="field">
       <label for="slope">Slope</label>
-      <input id="slope" name="slope" type="number" inputmode="numeric" placeholder="Slope" />
+      <input type="number" id="slope">
+    </div>
+  </div>
 
-      <!-- Handicap -->
+  <div class="row">
+    <div class="field">
       <label for="handicap">Handicap</label>
-      <input id="handicap" name="handicap" type="number" inputmode="numeric" placeholder="Handicap" />
-
-      <!-- Notes -->
+      <input type="number" id="handicap">
+    </div>
+  </div>
+  
+  <div class="row full">
+    <div class="field">
       <label for="notes">Notes</label>
-      <textarea id="notes" name="notes" placeholder="Add any comments or conditions"></textarea>
+      <textarea id="notes" rows="3" placeholder="Add any comments or conditions"></textarea>
+    </div>
+  </div>
 
-      <!-- Save button -->
-      <button id="saveBtn" type="submit">Save Round</button>
-    </form>
+  <button id="saveBtn">Save Round</button>
 
-    <!-- Saved rounds -->
-    <section id="savedRounds" aria-live="polite">
-      <h2 class="visually-hidden">Saved Rounds</h2>
-      <div id="roundList"></div>
-    </section>
-  </main>
+  <div id="savedRounds"></div>
 
   <script>
-    function escapeHtml(str) {
-      return String(str || '').replace(/[&<>"']/g, m => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      })[m]);
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const saveBtn = document.getElementById("saveBtn");
+      const savedRounds = document.getElementById("savedRounds");
 
-    function loadRounds() {
-      try {
-        return JSON.parse(localStorage.getItem('golfRounds') || '[]');
-      } catch {
-        return [];
+      function saveRound() {
+        const date = document.getElementById("date").value;
+        const course = document.getElementById("course").value;
+        const score = document.getElementById("score").value;
+        const slope = document.getElementById("slope").value;
+        const rating = ""; // intentionally omitted
+        const handicap = document.getElementById("handicap").value;
+        const notes = document.getElementById("notes").value;
+
+        const round = `${date} — ${course} | Score: ${score}, Slope: ${slope}, Handicap: ${handicap} | ${notes}`;
+        const timestamp = new Date().toLocaleString();
+        localStorage.setItem("round_" + timestamp, round);
+
+        displayRounds();
       }
-    }
 
-    function saveRounds(list) {
-      localStorage.setItem('golfRounds', JSON.stringify(list));
-    }
+      function displayRounds() {
+        savedRounds.innerHTML = "<h2>Saved Rounds</h2>";
 
-    function renderRounds() {
-      const list = loadRounds();
-      const container = document.getElementById('roundList');
-      container.innerHTML = '';
-      if (!list.length) {
-        container.textContent = 'No saved rounds';
-        return;
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.startsWith("round_")) {
+            const round = localStorage.getItem(key);
+            const entry = document.createElement("div");
+            entry.className = "round-entry";
+            entry.textContent = round;
+            savedRounds.appendChild(entry);
+          }
+        }
       }
-      list.forEach((r, idx) => {
-        const el = document.createElement('div');
-        el.className = 'log-line';
-        el.innerHTML = `
-          <strong>${escapeHtml(r.date)}</strong> — ${escapeHtml(r.course)}<br>
-          Score: ${escapeHtml(r.score)} | Slope: ${escapeHtml(r.slope)} | Handicap: ${escapeHtml(r.handicap)}
-          ${r.notes ? `<div class="note">${escapeHtml(r.notes)}</div>` : ''}
-          <button class="del" data-i="${idx}" type="button">Delete</button>
-        `;
-        container.appendChild(el);
-      });
-    }
 
-    function saveRound(e) {
-      e.preventDefault();
-      const round = {
-        date: document.getElementById('date').value.trim(),
-        course: document.getElementById('course').value.trim(),
-        score: document.getElementById('score').value.trim(),
-        slope: document.getElementById('slope').value.trim(),
-        handicap: document.getElementById('handicap').value.trim(),
-        notes: document.getElementById('notes').value.trim()
-      };
-      if (!round.date && !round.course && !round.score) return;
-      const list = loadRounds();
-      list.unshift(round);
-      saveRounds(list);
-      renderRounds();
-      document.getElementById('roundForm').reset();
-    }
-
-    document.addEventListener('click', ev => {
-      const btn = ev.target.closest('button.del');
-      if (!btn) return;
-      const idx = Number(btn.getAttribute('data-i'));
-      const list = loadRounds();
-      if (Number.isFinite(idx)) {
-        list.splice(idx, 1);
-        saveRounds(list);
-        renderRounds();
-      }
+      saveBtn.addEventListener("click", saveRound);
+      displayRounds();
     });
-
-    renderRounds();
   </script>
+
 </body>
 </html>
