@@ -38,6 +38,10 @@ textarea {
   box-sizing: border-box;
 }
 
+.app-scale {
+  transform: scale(1.25);
+  transform-origin: top left;
+}
 
 
 /* Notes field: slightly taller */
