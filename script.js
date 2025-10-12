@@ -1,56 +1,184 @@
-give document.addEventListener('DOMContentLoaded', () => {
-  const saveBtn = document.querySelector("button");
-  const savedRounds = document.getElementById("savedRounds");
-
-  // 🗓 Pre-fill today's date once, but allow manual edits
-  const dateField = document.getElementById("date");
-  if (dateField && !dateField.value) {
-    const today = new Date();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const yyyy = today.getFullYear();
-    dateField.value = `${mm}/${dd}/${yyyy}`;
-  }
-
-  function saveRound() {
-    const date = document.getElementById("date").value;
-    const course = document.getElementById("course").value;
-    const score = document.getElementById("score").value;
-    const slope = document.getElementById("slope").value;
-    const rating = document.getElementById("rating").value;
-    const handicap = document.getElementById("handicap").value;
-    const notes = document.getElementById("notes").value;
-
-    const round = `${date} — ${course} Score: ${score}, Slope: ${slope} ${notes}`;
-    const timestamp = new Date().toLocaleString();
-    localStorage.setItem("round_" + timestamp, round);
-
-    displayRounds();
-  }
-
-  function displayRounds() {
-    savedRounds.innerHTML = "";
-
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key.startsWith("round_")) {
-        const round = localStorage.getItem(key);
-        const entry = document.createElement("div");
-        entry.textContent = round;
-        savedRounds.appendChild(entry);
-      }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Golf Log</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      color: #222;
+      padding: 2rem;
+      max-width: 700px;
+      margin: auto;
     }
-  }
 
-  if (saveBtn) {
-    saveBtn.addEventListener("click", saveRound);
-  }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #0066cc;
+      padding-bottom: 0.5rem;
+    }
 
-  displayRounds();
-});
-document.getElementById("date").addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    document.getElementById("course").focus();
-  }
-});
+    .row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .row.full {
+      flex-direction: column;
+    }
+
+    .field {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .field label {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .field input,
+    .field textarea {
+      padding: 0.6rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button {
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.4rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background-color: #004c99;
+    }
+
+    #savedRounds {
+      margin-top: 2rem;
+    }
+
+    .round-entry {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Golf Log</h1>
+
+  <!-- First row: Date + Course -->
+  <div class="row">
+    <div class="field">
+      <label for="date">Date</label>
+      <input type="text" id="date" placeholder="mm/dd/yyyy">
+    </div>
+    <div class="field">
+      <label for="course">Course Name</label>
+      <input type="text" id="course">
+    </div>
+  </div>
+
+  <!-- Second row: Score + Slope -->
+  <div class="row">
+    <div class="field">
+      <label for="score">Score</label>
+      <input type="number" id="score">
+    </div>
+    <div class="field">
+      <label for="slope">Slope</label>
+      <input type="number" id="slope">
+    </div>
+  </div>
+
+  <!-- Third row: Handicap -->
+  <div class="row">
+    <div class="field">
+      <label for="handicap">Handicap</label>
+      <input type="number" id="handicap">
+    </div>
+  </div>
+
+  <!-- Final row: Notes -->
+  <div class="row full">
+    <div class="field">
+      <label for="notes">Notes</label>
+      <textarea id="notes" rows="3" placeholder="Add any comments or conditions"></textarea>
+    </div>
+  </div>
+
+  <button id="saveBtn">Save Round</button>
+
+  <div id="savedRounds"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const saveBtn = document.getElementById("saveBtn");
+      const savedRounds = document.getElementById("savedRounds");
+
+      // PLACED: Enter key moves from Date → Course
+      document.getElementById("date").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          document.getElementById("course").focus();
+        }
+      });
+
+      function saveRound() {
+        const date = document.getElementById("date").value;
+        const course = document.getElementById("course").value;
+        const score = document.getElementById("score").value;
+        const slope = document.getElementById("slope").value;
+        const handicap = document.getElementById("handicap").value;
+        const notes = document.getElementById("notes").value;
+
+        const round = `${date} — ${course} | Score: ${score}, Slope: ${slope}, Handicap: ${handicap} | ${notes}`;
+        const timestamp = new Date().toLocaleString();
+        localStorage.setItem("round_" + timestamp, round);
+
+        displayRounds();
+      }
+
+      function displayRounds() {
+        savedRounds.innerHTML = "<h2>Saved Rounds</h2>";
+
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.startsWith("round_")) {
+            const round = localStorage.getItem(key);
+            const entry = document.createElement("div");
+            entry.className = "round-entry";
+            entry.textContent = round;
+            savedRounds.appendChild(entry);
+          }
+        }
+      }
+
+      saveBtn.addEventListener("click", saveRound);
+      displayRounds();
+    });
+  </script>
+
+</body>
+</html>
