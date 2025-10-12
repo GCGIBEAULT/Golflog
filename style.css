@@ -1,6 +1,6 @@
 /* Base layout */
 html {
-  font-size: 32px; /* Doubled from 16px baseline */
+  font-size: 32px; /* Doubled baseline */
 }
 
 body {
@@ -8,38 +8,18 @@ body {
   background-color: #f4f4f4;
   color: #222;
   padding: 2rem;
-  max-width: 700px;
+  max-width: 100%; /* ← Remove width constraint */
   margin: auto;
 }
 
-
-/* Form layout: vertical stack */
 form {
-  display: flex;
-  flex-direction: column;
-  max-width: 520px;
-  gap: 0; /* ← kill the vertical spacing between form children */
+  max-width: 100%; /* ← Let it breathe */
+  gap: 0.5rem;      /* ← Add spacing between fields */
 }
 
-label {
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0;
-  padding: 0;
-  display: block;
-}
-
-input,
-textarea {
-  border: none;
-  background: transparent;
-  font-size: 1rem;         /* Match label size */
-  font-weight: 700;        /* Match label weight */
-  padding: 0.2rem 0;
-  margin: 0;
-  line-height: 1.2;
-  width: 100%;
-  box-sizing: border-box;
+input, textarea {
+  font-size: 1rem;      /* Scales from 32px root = 32px actual */
+  padding: 0.5rem 0.5rem; /* ← More breathing room */
 }
 
 
