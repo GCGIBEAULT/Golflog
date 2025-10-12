@@ -1,79 +1,35 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // 🔗 Input references
-  const dateInput = document.getElementById("date");
-  const courseInput = document.getElementById("course");
-  const scoreInput = document.getElementById("score");
-  const slopeInput = document.getElementById("slope");
-  const handicapInput = document.getElementById("handicap");
-  const notesInput = document.getElementById("notes");
+  // element refs used for non-save behaviors
   const saveBtn = document.getElementById("saveBtn");
   const savedRounds = document.getElementById("savedRounds");
-
-  if (!dateInput || !courseInput) {
-    console.error("Missing #date or #course input — check IDs in HTML");
+  if (!savedRounds) {
+    console.error("Missing #savedRounds element — check HTML IDs");
     return;
   }
 
-  // ⏎ Enter override: Date → Course
-  function advanceToCourse(e) {
-    const isEnter = e.key === "Enter" || e.code === "Enter" || e.keyCode === 13;
-    if (!isEnter || document.activeElement !== dateInput) return;
-    e.preventDefault();
-    e.stopPropagation();
-    setTimeout(() => {
-      courseInput.focus();
-      console.log("Date → Course: Enter handled, focus moved");
-    }, 0);
-  }
-
-  dateInput.addEventListener("keydown", advanceToCourse);
-  dateInput.addEventListener("keypress", advanceToCourse);
-
-  // 💾 Save logic
-  function saveRound() {
-    const date = dateInput.value;
-    const course = courseInput.value;
-    const score = scoreInput?.value || "";
-    const slope = slopeInput?.value || "";
-    const handicap = handicapInput?.value || "";
-    const notes = notesInput?.value || "";
-
-    const round = `${date} — ${course} | Score: ${score}, Slope: ${slope}, Handicap: ${handicap} | ${notes}`;
-    const timestamp = new Date().toLocaleString();
-
-    try {
-      localStorage.setItem("round_" + timestamp, round);
-    } catch (err) {
-      console.warn("Could not write to localStorage", err);
+  // Enter override: Date -> Course
+  const dateEl = document.getElementById("date");
+  const courseEl = document.getElementById("course");
+  if (dateEl && courseEl) {
+    function advanceToCourse(e) {
+      const isEnter = e.key === "Enter" || e.code === "Enter" || e.keyCode === 13;
+      if (!isEnter || document.activeElement !== dateEl) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setTimeout(() => courseEl.focus(), 0);
     }
-
-    displayRounds();
-
-    // 🧹 Clear inputs after save
-    dateInput.value = "";
-    courseInput.value = "";
-    scoreInput.value = "";
-    slopeInput.value = "";
-    handicapInput.value = "";
-    notesInput.value = "";
-
-    // 🔁 Reset focus to Date
-    dateInput.focus();
+    dateEl.addEventListener("keydown", advanceToCourse);
+    dateEl.addEventListener("keypress", advanceToCourse);
   }
 
-  // 📋 Display logic
+  // Display saved rounds
   function displayRounds() {
-    if (!savedRounds) return;
     savedRounds.innerHTML = "<h2>Saved Rounds</h2>";
-
     const keys = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key?.startsWith("round_")) {
-        keys.push(key);
-      }
+      if (key && key.startsWith("round_")) keys.push(key);
     }
-
     keys.sort().reverse(); // newest first
 
     for (const key of keys) {
@@ -85,18 +41,60 @@ document.addEventListener('DOMContentLoaded', () => {
         <button class="delete-btn" data-key="${key}" title="Delete this round">×</button>
       `;
       savedRounds.appendChild(entry);
-
-      // 🗑️ Wire up delete logic
       entry.querySelector(".delete-btn").addEventListener("click", function () {
         const keyToDelete = this.getAttribute("data-key");
         localStorage.removeItem(keyToDelete);
-        displayRounds(); // re-render after deletion
+        displayRounds();
       });
     }
   }
 
-  if (saveBtn) saveBtn.addEventListener("click", saveRound);
-  displayRounds();
+  // SAVE: direct DOM queries inside function to avoid timing/scope issues on mobile
+  function saveRound() {
+    const date = document.getElementById("date")?.value || "";
+    const course = document.getElementById("course")?.value || "";
+    const score = document.getElementById("score")?.value || "";
+    const slope = document.getElementById("slope")?.value || "";
+    const handicap = document.getElementById("handicap")?.value || "";
+    const notes = document.getElementById("notes")?.value || "";
 
-  console.log("script.js loaded — inputs clear after save, delete buttons active");
+    const round = `${date} — ${course} | Score: ${score}, Slope: ${slope}, Handicap: ${handicap} | ${notes}`;
+    const timestamp = new Date().toISOString(); // stable key
+    try {
+      localStorage.setItem("round_" + timestamp, round);
+    } catch (err) {
+      console.warn("localStorage write failed", err);
+    }
+
+    displayRounds();
+
+    // Clear fields — direct DOM writes, then blur/refocus to avoid mobile keyboard/value artifacts
+    const d = document.getElementById("date");
+    const c = document.getElementById("course");
+    const s = document.getElementById("score");
+    const sl = document.getElementById("slope");
+    const h = document.getElementById("handicap");
+    const n = document.getElementById("notes");
+
+    if (d) { d.value = ""; d.blur(); }
+    if (c) { c.value = ""; c.blur(); }
+    if (s) { s.value = ""; s.blur(); }
+    if (sl) { sl.value = ""; sl.blur(); }
+    if (h) { h.value = ""; h.blur(); }
+    if (n) { n.value = ""; n.blur(); }
+
+    // small delay before refocus reduces mobile race conditions
+    setTimeout(() => {
+      const dateField = document.getElementById("date");
+      if (dateField) {
+        dateField.focus();
+        // ensure caret at start on some mobile browsers
+        if (dateField.setSelectionRange) dateField.setSelectionRange(0, 0);
+      }
+    }, 120);
+  }
+
+  if (saveBtn) saveBtn.addEventListener("click", (e) => { e.preventDefault(); saveRound(); });
+  displayRounds();
+  console.log("script.js loaded: saveRound clears fields (mobile-safe)");
 });
