@@ -90,21 +90,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // 📋 Display logic
-  function displayRounds() {
-    if (!savedRounds) return;
-    savedRounds.innerHTML = "<h2>Saved Rounds</h2>";
+function displayRounds() {
+  if (!savedRounds) return;
+  savedRounds.innerHTML = "<h2>Saved Rounds</h2>";
 
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key?.startsWith("round_")) {
-        const round = localStorage.getItem(key);
-        const entry = document.createElement("div");
-        entry.className = "round-entry";
-        entry.textContent = round;
-        savedRounds.appendChild(entry);
-      }
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith("round_")) {
+      keys.push(key);
     }
   }
+
+  keys.sort().reverse(); // newest first
+
+  for (const key of keys) {
+    const round = localStorage.getItem(key);
+    const entry = document.createElement("div");
+    entry.className = "round-entry";
+    entry.textContent = round;
+    savedRounds.appendChild(entry);
+  }
+}
 
   if (saveBtn) saveBtn.addEventListener("click", saveRound);
 
