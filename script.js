@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+give document.addEventListener('DOMContentLoaded', () => {
   const saveBtn = document.querySelector("button");
   const savedRounds = document.getElementById("savedRounds");
 
@@ -47,4 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   displayRounds();
+});
+document.getElementById("date").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    document.getElementById("course").focus();
+  }
 });
