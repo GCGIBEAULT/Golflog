@@ -1,98 +1,175 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Golf Log — Mobile Score Tracker</title>
-  <meta name="description" content="Golf Log app for tracking rounds, scores, and conditions." />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <main id="app" class="container">
-    <h1>Golf Log</h1>
+/* style.css — Full page stylesheet
+   Mobile-first, readable, enforces single-column order:
+   Date, Course Name, Score, Slope, Handicap, Notes, Save Round, Saved Rounds
+*/
 
-    <form id="roundForm" class="single-column" onsubmit="saveRound(event)">
-      <label for="date">Date</label>
-      <input id="date" name="date" type="text" placeholder="mm/dd/yyyy" inputmode="numeric" />
+/* Base / accessibility */
+html {
+  font-size: 20px;
+  -webkit-text-size-adjust: 100%;
+  box-sizing: border-box;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
 
-      <label for="course">Course Name</label>
-      <input id="course" name="course" type="text" placeholder="Course Name" />
+body {
+  margin: 0;
+  padding: 1rem;
+  font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: #ffffff;
+  color: #111111;
+  line-height: 1.35;
+  -webkit-font-smoothing: antialiased;
+}
 
-      <label for="score">Score</label>
-      <input id="score" name="score" type="number" inputmode="numeric" placeholder="Score" />
+/* Container */
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+}
 
-      <label for="slope">Slope</label>
-      <input id="slope" name="slope" type="number" inputmode="numeric" placeholder="Slope" />
+/* Headings */
+h1 {
+  font-size: 1.6rem;
+  margin: 0 0 0.75rem 0;
+  border-bottom: 2px solid #0066cc;
+  padding-bottom: 0.5rem;
+  font-weight: 700;
+}
 
-      <label for="handicap">Handicap</label>
-      <input id="handicap" name="handicap" type="number" inputmode="numeric" placeholder="Handicap" />
+/* Visually hidden helper */
+.visually-hidden {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
 
-      <label for="notes">Notes</label>
-      <textarea id="notes" name="notes" placeholder="Add any comments or conditions"></textarea>
+/* FORCE single-column layout for the form and neutralize any .row flex */
+form.single-column,
+#roundForm {
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
 
-      <button id="saveBtn" type="submit">Save Round</button>
-    </form>
+/* Neutralize site-level .row flex rules */
+.row {
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+.row > * {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 0 0.6rem 0 !important;
+  box-sizing: border-box !important;
+}
 
-    <section id="savedRounds" aria-live="polite">
-      <h2 class="visually-hidden">Saved Rounds</h2>
-      <div id="roundList"></div>
-    </section>
-  </main>
+/* Ensure every element inside the form stacks and is full width */
+#roundForm * {
+  float: none !important;
+  display: block !important;
+  flex: none !important;
+  width: 100% !important;
+  margin: 0 0 0.6rem 0 !important;
+  box-sizing: border-box !important;
+}
 
-  <script>
-    // Minimal, self-contained JS — safe to replace current script
-    function renderRounds() {
-      const list = JSON.parse(localStorage.getItem('golfRounds') || '[]');
-      const container = document.getElementById('roundList');
-      container.innerHTML = '';
-      if (!list.length) {
-        container.textContent = 'No saved rounds';
-        return;
-      }
-      list.forEach((r, idx) => {
-        const el = document.createElement('div');
-        el.className = 'log-line';
-        el.innerHTML = `<strong>${r.date}</strong> — ${escapeHtml(r.course)} — ${r.score} — ${r.slope} — ${r.handicap}<div class="note">${escapeHtml(r.notes)}</div><button class="del" data-i="${idx}">Delete</button>`;
-        container.appendChild(el);
-      });
-    }
+/* Labels */
+label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #222;
+  display: block;
+  margin-bottom: 0.25rem;
+}
 
-    function saveRound(e) {
-      if (e) e.preventDefault();
-      const date = document.getElementById('date').value.trim();
-      const course = document.getElementById('course').value.trim();
-      const score = document.getElementById('score').value.trim();
-      const slope = document.getElementById('slope').value.trim();
-      const handicap = document.getElementById('handicap').value.trim();
-      const notes = document.getElementById('notes').value.trim();
+/* Controls: tappable and readable */
+input, textarea, select, button {
+  font-size: 1rem;
+  padding: 0.7rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+}
 
-      if (!date && !course && !score) return;
+/* Textarea */
+textarea {
+  min-height: 4.5rem;
+  resize: vertical;
+}
 
-      const list = JSON.parse(localStorage.getItem('golfRounds') || '[]');
-      list.unshift({ date, course, score, slope, handicap, notes });
-      localStorage.setItem('golfRounds', JSON.stringify(list));
-      renderRounds();
-      document.getElementById('roundForm').reset();
-    }
+/* Primary button */
+button[type="submit"], #saveBtn {
+  background: #007BFF;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.8rem;
+  border-radius: 8px;
+}
+button[type="submit"]:focus, button[type="submit"]:active,
+#saveBtn:focus, #saveBtn:active {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.12);
+}
 
-    function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, function (m) {
-        return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m];
-      });
-    }
+/* Saved rounds list */
+#savedRounds {
+  margin-top: 1rem;
+  clear: both !important;
+  display: block !important;
+  width: 100% !important;
+}
+.log-line {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.98rem;
+}
+.log-line .note {
+  margin-top: 0.4rem;
+  color: #333;
+  font-size: 0.95rem;
+}
+button.del {
+  margin-top: 0.45rem;
+  background: #e0e0e0;
+  color: #111;
+  border: none;
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-    document.addEventListener('click', function (ev) {
-      const d = ev.target.closest('button.del');
-      if (!d) return;
-      const idx = Number(d.getAttribute('data-i'));
-      const list = JSON.parse(localStorage.getItem('golfRounds') || '[]');
-      list.splice(idx, 1);
-      localStorage.setItem('golfRounds', JSON.stringify(list));
-      renderRounds();
-    });
+/* Accessibility focus ring for inputs */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.08);
+  border-color: rgba(0,123,255,0.6);
+}
 
-    // initial render
-    renderRounds();
-  </script>
-</body>
-</html>
+/* Larger screens: slightly increase base and spacing */
+@media (min-width: 600px) {
+  html { font-size: 22px; }
+  .container { padding: 1rem; }
+  .log-line { font-size: 1rem; }
+}
+
+/* Very small narrow phones: tighten vertical rhythm */
+@media (max-width: 360px) {
+  input, textarea, select, button {
+    padding: 0.6rem;
+    font-size: 0.95rem;
+  }
+  h1 { font-size: 1.4rem; }
+}
