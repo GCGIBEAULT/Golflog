@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,20 +8,18 @@
       font-family: Arial, sans-serif;
       margin: 20px;
     }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
     input, textarea {
       width: 100%;
       padding: 6px;
-      margin-top: 4px;
+      margin-top: 10px;
+      box-sizing: border-box;
     }
     button {
       margin-top: 12px;
       padding: 8px 16px;
+      cursor: pointer;
     }
-    #roundList div {
+    #savedRounds div {
       margin-top: 8px;
       padding: 6px;
       border-bottom: 1px solid #ccc;
@@ -33,36 +30,63 @@
 
   <h1>Golf Log</h1>
 
-  <label for="date">Date (mm/dd/yyyy)</label>
-  <input type="text" id="date" placeholder="e.g. 10/11/2025">
-
-  <label for="time">Time (hh:mm AM/PM)</label>
-  <input type="text" id="time" placeholder="e.g. 12:04 PM">
-
-  <label for="course">Course Name</label>
-  <input type="text" id="course">
-
-  <label for="score">Score</label>
-  <input type="number" id="score">
-
-  <label for="slope">Slope</label>
-  <input type="number" id="slope">
-
-  <label for="rating">Rating</label>
-  <input type="number" id="rating">
-
-  <label for="handicap">Handicap</label>
-  <input type="number" id="handicap">
-
-  <label for="notes">Notes</label>
-  <textarea id="notes" rows="3"></textarea>
+  <input type="text" id="date" placeholder="Date (mm/dd/yyyy)">
+  <input type="text" id="time" placeholder="Time (hh:mm AM/PM)">
+  <input type="text" id="course" placeholder="Course Name">
+  <input type="number" id="score" placeholder="Score">
+  <input type="number" id="slope" placeholder="Slope">
+  <input type="number" id="rating" placeholder="Rating">
+  <input type="number" id="handicap" placeholder="Handicap">
+  <textarea id="notes" rows="3" placeholder="Notes"></textarea>
 
   <button id="saveBtn">Save Round</button>
 
   <h2>Saved Rounds</h2>
-  <div id="roundList"></div>
+  <div id="savedRounds"></div>
 
-  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const saveBtn = document.getElementById("saveBtn");
+      const savedRounds = document.getElementById("savedRounds");
+
+      function saveRound() {
+        const date = document.getElementById("date").value;
+        const time = document.getElementById("time").value;
+        const course = document.getElementById("course").value;
+        const score = document.getElementById("score").value;
+        const slope = document.getElementById("slope").value;
+        const rating = document.getElementById("rating").value;
+        const handicap = document.getElementById("handicap").value;
+        const notes = document.getElementById("notes").value;
+
+        const round = `${date} ${time} — ${course} Score: ${score}, Slope: ${slope}, Rating: ${rating}, Handicap: ${handicap} ${notes}`;
+        const timestamp = new Date().toLocaleString();
+        localStorage.setItem("round_" + timestamp, round);
+
+        displayRounds();
+      }
+
+      function displayRounds() {
+        savedRounds.innerHTML = "";
+
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.startsWith("round_")) {
+            const round = localStorage.getItem(key);
+            const entry = document.createElement("div");
+            entry.textContent = round;
+            savedRounds.appendChild(entry);
+          }
+        }
+      }
+
+      if (saveBtn) {
+        saveBtn.addEventListener("click", saveRound);
+      }
+
+      displayRounds();
+    });
+  </script>
 
 </body>
 </html>
