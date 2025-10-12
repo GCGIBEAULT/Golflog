@@ -108,8 +108,21 @@ function displayRounds() {
     const round = localStorage.getItem(key);
     const entry = document.createElement("div");
     entry.className = "round-entry";
-    entry.textContent = round;
-    savedRounds.appendChild(entry);
+entry.innerHTML = `
+  <span class="round-text">${round}</span>
+  <button class="delete-btn" data-key="${key}" title="Delete this round">×</button>
+`;
+
+savedRounds.appendChild(entry);
+
+// 🗑️ Wire up delete logic
+entry.querySelector(".delete-btn").addEventListener("click", function () {
+  const keyToDelete = this.getAttribute("data-key");
+  localStorage.removeItem(keyToDelete);
+  displayRounds(); // re-render after deletion
+});
+
+ 
   }
 }
 
