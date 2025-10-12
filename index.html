@@ -3,90 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <title>Golf Log</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
+    :root {
+      --font: 'Segoe UI', sans-serif;
+      --bg: #f9f9f9;
+      --fg: #333;
+      --accent: #0078D4;
+      --border: #ddd;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--fg);
+      margin: 0;
+      padding: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
-    input, textarea {
-      width: 100%;
-      padding: 6px;
-      margin-top: 10px;
-      box-sizing: border-box;
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
     }
-    button {
-      margin-top: 12px;
-      padding: 8px 16px;
-      cursor: pointer;
+
+    .field {
+      margin-bottom: 1rem;
     }
-    #savedRounds div {
-      margin-top: 8px;
-      padding: 6px;
-      border-bottom: 1px solid #ccc;
-    }
-  </style>
-</head>
-<body>
 
-  <h1>Golf Log</h1>
-
-  <input type="text" id="date" placeholder="Date (mm/dd/yyyy)">
-  <input type="text" id="time" placeholder="Time (hh:mm AM/PM)">
-  <input type="text" id="course" placeholder="Course Name">
-  <input type="number" id="score" placeholder="Score">
-  <input type="number" id="slope" placeholder="Slope">
-  <input type="number" id="rating" placeholder="Rating">
-  <input type="number" id="handicap" placeholder="Handicap">
-  <textarea id="notes" rows="3" placeholder="Notes"></textarea>
-
-  <button id="saveBtn">Save Round</button>
-
-  <h2>Saved Rounds</h2>
-  <div id="savedRounds"></div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const saveBtn = document.getElementById("saveBtn");
-      const savedRounds = document.getElementById("savedRounds");
-
-      function saveRound() {
-        const date = document.getElementById("date").value;
-        const time = document.getElementById("time").value;
-        const course = document.getElementById("course").value;
-        const score = document.getElementById("score").value;
-        const slope = document.getElementById("slope").value;
-        const rating = document.getElementById("rating").value;
-        const handicap = document.getElementById("handicap").value;
-        const notes = document.getElementById("notes").value;
-
-        const round = `${date} ${time} — ${course} Score: ${score}, Slope: ${slope}, Rating: ${rating}, Handicap: ${handicap} ${notes}`;
-        const timestamp = new Date().toLocaleString();
-        localStorage.setItem("round_" + timestamp, round);
-
-        displayRounds();
-      }
-
-      function displayRounds() {
-        savedRounds.innerHTML = "";
-
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key.startsWith("round_")) {
-            const round = localStorage.getItem(key);
-            const entry = document.createElement("div");
-            entry.textContent = round;
-            savedRounds.appendChild(entry);
-          }
-        }
-      }
-
-      if (saveBtn) {
-        saveBtn.addEventListener("click", saveRound);
-      }
-
-      displayRounds();
-    });
-  </script>
-
-</body>
-</html>
+    .field label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
