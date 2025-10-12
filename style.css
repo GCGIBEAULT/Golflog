@@ -1,183 +1,98 @@
-/* style.css — Full replacement (mobile-first, readable, stacks on phones) */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Golf Log — Mobile Score Tracker</title>
+  <meta name="description" content="Golf Log app for tracking rounds, scores, and conditions." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main id="app" class="container">
+    <h1>Golf Log</h1>
 
-/* Root / accessibility */
-html {
-  font-size: 20px;               /* readable baseline for phones; adjust to 22-24 if desired */
-  -webkit-text-size-adjust: 100%;
-  box-sizing: border-box;
-}
+    <form id="roundForm" class="single-column" onsubmit="saveRound(event)">
+      <label for="date">Date</label>
+      <input id="date" name="date" type="text" placeholder="mm/dd/yyyy" inputmode="numeric" />
 
-*, *::before, *::after {
-  box-sizing: inherit;
-}
+      <label for="course">Course Name</label>
+      <input id="course" name="course" type="text" placeholder="Course Name" />
 
-body {
-  font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  margin: 0;
-  padding: 1rem;
-  background: #ffffff;
-  color: #111111;
-  max-width: 100%;
-  line-height: 1.35;
-}
+      <label for="score">Score</label>
+      <input id="score" name="score" type="number" inputmode="numeric" placeholder="Score" />
 
-/* Headline */
-h1 {
-  font-size: 1.8rem;
-  margin: 0 0 1rem 0;
-  border-bottom: 2px solid #0066cc;
-  padding-bottom: 0.5rem;
-  font-weight: 700;
-}
+      <label for="slope">Slope</label>
+      <input id="slope" name="slope" type="number" inputmode="numeric" placeholder="Slope" />
 
-/* Basic row layout */
-.row {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-}
+      <label for="handicap">Handicap</label>
+      <input id="handicap" name="handicap" type="number" inputmode="numeric" placeholder="Handicap" />
 
-/* Two-column grouping (use .row.two-col for Date/Course | Score/Slope) */
-.row.two-col {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-}
+      <label for="notes">Notes</label>
+      <textarea id="notes" name="notes" placeholder="Add any comments or conditions"></textarea>
 
-/* Column container holds paired fields vertically */
-.row.two-col .col {
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+      <button id="saveBtn" type="submit">Save Round</button>
+    </form>
 
-/* Generic field wrapper if used */
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  width: 100%;
-}
+    <section id="savedRounds" aria-live="polite">
+      <h2 class="visually-hidden">Saved Rounds</h2>
+      <div id="roundList"></div>
+    </section>
+  </main>
 
-/* Controls: readable, tappable */
-label {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #222;
-}
+  <script>
+    // Minimal, self-contained JS — safe to replace current script
+    function renderRounds() {
+      const list = JSON.parse(localStorage.getItem('golfRounds') || '[]');
+      const container = document.getElementById('roundList');
+      container.innerHTML = '';
+      if (!list.length) {
+        container.textContent = 'No saved rounds';
+        return;
+      }
+      list.forEach((r, idx) => {
+        const el = document.createElement('div');
+        el.className = 'log-line';
+        el.innerHTML = `<strong>${r.date}</strong> — ${escapeHtml(r.course)} — ${r.score} — ${r.slope} — ${r.handicap}<div class="note">${escapeHtml(r.notes)}</div><button class="del" data-i="${idx}">Delete</button>`;
+        container.appendChild(el);
+      });
+    }
 
-input, textarea, select, button {
-  font-size: 1rem;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
-  color: #111;
-  width: 100%;
-  min-width: 0;
-}
+    function saveRound(e) {
+      if (e) e.preventDefault();
+      const date = document.getElementById('date').value.trim();
+      const course = document.getElementById('course').value.trim();
+      const score = document.getElementById('score').value.trim();
+      const slope = document.getElementById('slope').value.trim();
+      const handicap = document.getElementById('handicap').value.trim();
+      const notes = document.getElementById('notes').value.trim();
 
-/* Inputs that should visibly match height */
-input[type="number"], input[type="text"], input[type="date"] {
-  height: auto;
-}
+      if (!date && !course && !score) return;
 
-/* Textarea */
-textarea {
-  min-height: 4.5rem;
-  resize: vertical;
-}
+      const list = JSON.parse(localStorage.getItem('golfRounds') || '[]');
+      list.unshift({ date, course, score, slope, handicap, notes });
+      localStorage.setItem('golfRounds', JSON.stringify(list));
+      renderRounds();
+      document.getElementById('roundForm').reset();
+    }
 
-/* Primary button */
-button {
-  background-color: #007BFF;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  padding: 0.7rem;
-  border-radius: 6px;
-  font-weight: 600;
-}
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, function (m) {
+        return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m];
+      });
+    }
 
-button:focus, button:active {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0,123,255,0.12);
-}
+    document.addEventListener('click', function (ev) {
+      const d = ev.target.closest('button.del');
+      if (!d) return;
+      const idx = Number(d.getAttribute('data-i'));
+      const list = JSON.parse(localStorage.getItem('golfRounds') || '[]');
+      list.splice(idx, 1);
+      localStorage.setItem('golfRounds', JSON.stringify(list));
+      renderRounds();
+    });
 
-/* Saved rounds list */
-#savedRounds {
-  margin-top: 1.25rem;
-}
-
-.log-line {
-  font-size: 1rem;
-  line-height: 1.4;
-  margin-bottom: 0.6rem;
-  word-break: break-word;
-}
-
-/* Desktop / wider screens: increase root slightly and keep two columns */
-@media (min-width: 600px) {
-  html { font-size: 22px; }
-  .row.two-col { gap: 1.25rem; }
-  input, textarea, button { font-size: 1.0625rem; }
-}
-
-/* Strong mobile stacking fallback: forces single-column on narrow phones
-   This ensures the right-hand column drops under the left-hand column,
-   so Course appears under Date and Slope under Score. */
-@media (max-width: 480px) {
-  html { font-size: 20px; } /* keep a comfortable base on small screens */
-
-  /* make any .row behave as a vertical stack for extra safety */
-  .row {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0.5rem !important;
-  }
-
-  /* specifically stack the two-column grouping */
-  .row.two-col {
-    flex-direction: column !important;
-  }
-
-  /* ensure each column or direct child of .row takes full width */
-  .row > *, .row.two-col .col {
-    width: 100% !important;
-    flex: none !important;
-    margin: 0 !important;
-    box-sizing: border-box !important;
-  }
-
-  /* ensure controls fill width and are tappable */
-  .row > * input,
-  .row > * textarea,
-  .row > * select,
-  .row > * button,
-  .row.two-col .col input,
-  .row.two-col .col textarea,
-  .row.two-col .col select,
-  .row.two-col .col button {
-    display: block !important;
-    width: 100% !important;
-    padding: 0.65rem !important;
-    font-size: 1rem !important;
-  }
-
-  /* labels above controls for clarity */
-  .row > * label, .row.two-col .col label {
-    display: block !important;
-    margin-bottom: 0.25rem !important;
-    font-size: 0.95rem !important;
-  }
-
-  /* tighten vertical rhythm to fit narrow phones */
-  .row > * + *, .row.two-col .col + .col {
-    margin-top: 0.25rem !important;
-  }
-
-  /* slightly reduce saved rounds size so list doesn't dominate small viewports */
-  .log-line { font-size: 0.95rem !important; }
-}
+    // initial render
+    renderRounds();
+  </script>
+</body>
+</html>
