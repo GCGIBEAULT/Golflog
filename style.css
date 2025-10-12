@@ -1,27 +1,45 @@
-/* Base layout */
+/* Root font size: doubled for mobile readability */
 html {
-  font-size: 32px; /* Doubled baseline */
+  font-size: 32px;
 }
 
+/* Body layout: breathable, centered, no constraint */
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f4f4f4;
-  color: #222;
+  font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+  margin: 0;
   padding: 2rem;
-  max-width: 100%; /* ← Remove width constraint */
-  margin: auto;
+  background: #fff;
+  color: #111;
+  max-width: 100%;
 }
 
-form {
-  max-width: 100%; /* ← Let it breathe */
-  gap: 0.5rem;      /* ← Add spacing between fields */
+/* Headline: bold and clear */
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #0066cc;
+  padding-bottom: 0.5rem;
 }
 
-input, textarea {
-  font-size: 1rem;      /* Scales from 32px root = 32px actual */
-  padding: 0.5rem 0.5rem; /* ← More breathing room */
+/* Form layout: stacked and spaced */
+.row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
+.row.full {
+  flex-direction: column;
+}
+
+/* Inputs and button: readable and tappable */
+input, textarea, button {
+  font-size: 2rem;
+  padding: 0.75rem;
+  line-height: 1.4;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
 
 /* Notes field: slightly taller */
 textarea {
@@ -29,59 +47,28 @@ textarea {
   min-height: 2.2rem;
 }
 
-/* Save button: untouched */
-#saveBtn {
-  margin-top: 0.8rem;
-  align-self: flex-start;
+/* Save button: bold and visible */
+button {
   background-color: #007BFF;
   color: white;
-  font-size: 0.85rem;
-  padding: 0.4rem 0.8rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
-#saveBtn:hover {
+
+button:hover {
   background-color: #0056b3;
 }
 
-
-/* Output log: compact rhythm */
-#log {
-  margin-top: 1rem;
-  max-width: 720px;
+/* Saved rounds: readable and spaced */
+#savedRounds {
+  margin-top: 2rem;
 }
 
 .log-line {
-  margin: 0 0 0.12rem 0;
-  line-height: 1.1;
-}
-
-.log-line strong {
-  font-weight: 700;
-}
-
-/* Handicap line: compact and indented */
-.handicap-line {
-  font-size: 0.9rem;
-  color: #444;
-  font-style: italic;
-  margin-top: 0.12rem;
-  padding-left: 0.5rem;
-  border-left: 2px solid #007BFF;
-}
-.round {
-  animation: fadeInMove 0.4s ease-out;
-}
-
-@keyframes fadeInMove {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  font-size: 1.8rem;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+  word-break: break-word;
 }
