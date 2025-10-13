@@ -1,15 +1,6 @@
-// script.js - mobile-safe, clears fields after save, autofills date on all devices
 document.addEventListener('DOMContentLoaded', () => {
-  // ✅ Autofill today's date (desktop)
+  // ✅ Autofill today's date
   document.getElementById("date").value = new Date().toLocaleDateString("en-US");
-
-  // ✅ Mobile-safe fallback for autofill
-  window.addEventListener("load", () => {
-    const dateInput = document.getElementById("date");
-    if (dateInput && !dateInput.value) {
-      dateInput.value = new Date().toLocaleDateString("en-US");
-    }
-  });
 
   const saveBtn = document.getElementById("saveBtn");
   const savedRounds = document.getElementById("savedRounds");
@@ -18,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // UX: Enter on date advances to course
   const dateEl = document.getElementById("date");
   const courseEl = document.getElementById("course");
   if (dateEl && courseEl) {
@@ -85,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     displayRounds();
 
-    // Clear inputs
     const form = document.getElementById("roundForm") || document.querySelector("form");
     if (form) try { form.reset(); } catch (e) {}
 
@@ -101,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // ✅ Reapply autofill after Save
     setTimeout(() => {
       const dateField = document.getElementById("date");
       if (dateField) {
@@ -122,5 +110,4 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   displayRounds();
-  console.log("script.js loaded: autofill + mobile-safe clear active");
 });
