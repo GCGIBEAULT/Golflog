@@ -1,7 +1,15 @@
-// script.js - single-commit replacement (mobile-safe, clears fields after save)
+// script.js - mobile-safe, clears fields after save, autofills date on all devices
 document.addEventListener('DOMContentLoaded', () => {
-  // ✅ Autofill today's date
+  // ✅ Autofill today's date (desktop)
   document.getElementById("date").value = new Date().toLocaleDateString("en-US");
+
+  // ✅ Mobile-safe fallback for autofill
+  window.addEventListener("load", () => {
+    const dateInput = document.getElementById("date");
+    if (dateInput && !dateInput.value) {
+      dateInput.value = new Date().toLocaleDateString("en-US");
+    }
+  });
 
   const saveBtn = document.getElementById("saveBtn");
   const savedRounds = document.getElementById("savedRounds");
@@ -25,7 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function escapeHtml(s) {
     return String(s)
       .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   function displayRounds() {
@@ -76,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     displayRounds();
 
-    // Clear inputs (mobile-safe)
+    // Clear inputs
     const form = document.getElementById("roundForm") || document.querySelector("form");
     if (form) try { form.reset(); } catch (e) {}
 
@@ -92,10 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // ✅ Reapply autofill after Save
     setTimeout(() => {
       const dateField = document.getElementById("date");
       if (dateField) {
         try {
+          dateField.value = new Date().toLocaleDateString("en-US");
           dateField.focus();
           if (dateField.setSelectionRange) dateField.setSelectionRange(0, 0);
         } catch (e) {}
@@ -111,5 +122,5 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   displayRounds();
-  console.log("script.js loaded: mobile-safe clear after save active");
+  console.log("script.js loaded: autofill + mobile-safe clear active");
 });
