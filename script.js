@@ -1,22 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // ✅ Autofill today's date
   document.getElementById("date").value = new Date().toLocaleDateString("en-US");
 
   const saveBtn = document.getElementById("saveBtn");
   const savedRounds = document.getElementById("savedRounds");
-  if (!savedRounds) {
-    console.error("Missing #savedRounds element — check HTML IDs");
-    return;
-  }
+
+  if (!savedRounds) return;
 
   const dateEl = document.getElementById("date");
   const courseEl = document.getElementById("course");
+
   if (dateEl && courseEl) {
     dateEl.addEventListener("keydown", e => {
-      const isEnter = e.key === "Enter" || e.code === "Enter" || e.keyCode === 13;
-      if (!isEnter || document.activeElement !== dateEl) return;
-      e.preventDefault(); e.stopPropagation();
-      setTimeout(() => courseEl.focus(), 0);
+      if ((e.key === "Enter" || e.code === "Enter" || e.keyCode === 13) && document.activeElement === dateEl) {
+        e.preventDefault();
+        e.stopPropagation();
+        setTimeout(() => courseEl.focus(), 0);
+      }
     });
   }
 
@@ -27,14 +26,46 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/'/g, "&#39;");
   }
 
+  function calculateCumulativeHandicap() {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith("round_"));
+    const handicaps = [];
+
+    keys.forEach(key => {
+      const round = localStorage.getItem(key);
+      const match = round.match(/Score: (\d+), Slope: (\d+)/);
+      if (match) {
+        const score = parseFloat(match[1]);
+        const slope = parseFloat(match[2]);
+        if (!isNaN(score) && !isNaN(slope) && slope !== 0) {
+          const scaled = ((score - 72) / slope) * 113;
+          const h = Math.max(0, Math.min(scaled, 36));
+          handicaps.push(h);
+        }
+      }
+    });
+
+    const handicapField = document.getElementById("handicap");
+    if (handicapField) {
+      if (handicaps.length > 0) {
+        const avg = handicaps.reduce((a, b) => a + b, 0) / handicaps.length;
+        handicapField.value = avg.toFixed(1);
+      } else {
+        handicapField.value = "—";
+      }
+    }
+  }
+
   function displayRounds() {
     savedRounds.innerHTML = "<h2>Saved Rounds</h2>";
     const keys = [];
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith("round_")) keys.push(key);
     }
+
     keys.sort().reverse();
+
     for (const key of keys) {
       const round = localStorage.getItem(key) || "";
       const entry = document.createElement("div");
@@ -44,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <button class="delete-btn" data-key="${key}" title="Delete this round">×</button>
       `;
       savedRounds.appendChild(entry);
+
       const del = entry.querySelector(".delete-btn");
       if (del) {
         del.addEventListener("click", function () {
@@ -51,22 +83,31 @@ document.addEventListener('DOMContentLoaded', () => {
           if (keyToDelete) {
             localStorage.removeItem(keyToDelete);
             displayRounds();
+            calculateCumulativeHandicap();
           }
         });
       }
     }
+
+    calculateCumulativeHandicap();
   }
 
   function saveRound() {
     const date = document.getElementById("date")?.value || "";
     const course = document.getElementById("course")?.value || "";
-    const score = document.getElementById("score")?.value || "";
-    const slope = document.getElementById("slope")?.value || "";
-    const handicap = document.getElementById("handicap")?.value || "";
+    const scoreVal = parseFloat(document.getElementById("score")?.value || "");
+    const slopeVal = parseFloat(document.getElementById("slope")?.value || "");
     const notes = document.getElementById("notes")?.value || "";
 
-    const round = `${date} — ${course} | Score: ${score}, Slope: ${slope}, Handicap: ${handicap} | ${notes}`;
+    let handicapVal = "";
+    if (!isNaN(scoreVal) && !isNaN(slopeVal) && slopeVal !== 0) {
+      const scaled = ((scoreVal - 72) / slopeVal) * 113;
+      handicapVal = Math.max(0, Math.min(scaled, 36)).toFixed(1);
+    }
+
+    const round = `${date} — ${course} | Score: ${scoreVal}, Slope: ${slopeVal} | ${notes}`;
     const timestamp = new Date().toISOString();
+
     try {
       localStorage.setItem("round_" + timestamp, round);
     } catch (err) {
@@ -78,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById("roundForm") || document.querySelector("form");
     if (form) try { form.reset(); } catch (e) {}
 
-    const ids = ["date", "course", "score", "slope", "handicap", "notes"];
+    const ids = ["date", "course", "score", "slope", "notes"];
     ids.forEach(id => {
       const el = document.getElementById(id);
       if (el) {
@@ -100,6 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {}
       }
     }, 150);
+
+    calculateCumulativeHandicap();
   }
 
   if (saveBtn) {
