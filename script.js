@@ -25,23 +25,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const keys = Object.keys(localStorage).filter(k => k.startsWith("round_"));
     const handicaps = [];
     keys.forEach(key => {
-const raw = localStorage.getItem(key) || '';
-const text = String(raw)
-  .replace(/&lt;br&gt;/gi, ' ')
-  .replace(/<br\s*\/?>/gi, ' ')
-  .replace(/\s+/g, ' ')
-  .trim();
-const match = text.match(/Score:\s*(\d+),?\s*Slope:\s*(\d+)/i);
-if (match) {
-  const score = parseFloat(match[1]);
-  const slope = parseFloat(match[2]);
-  if (!isNaN(score) && !isNaN(slope) && slope !== 0) {
-    const scaled = ((score - 72) / slope) * 113;
-    const h = Math.max(0, Math.min(scaled, 36));
-    handicaps.push(h);
-  }
-}
-
+      const round = localStorage.getItem(key);
+      const match = round.match(/Score: (\d+), Slope: (\d+)/);
+      if (match) {
+        const score = parseFloat(match[1]);
+        const slope = parseFloat(match[2]);
+        if (!isNaN(score) && !isNaN(slope) && slope !== 0) {
+          const scaled = ((score - 72) / slope) * 113;
+          const h = Math.max(0, Math.min(scaled, 36));
+          handicaps.push(h);
+        }
+      }
+    });
     const handicapField = document.getElementById("handicap");
     if (handicapField) {
       if (handicaps.length > 0) {
